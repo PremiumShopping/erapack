@@ -42,6 +42,24 @@ export const cssEase = {
   out: "cubic-bezier(0.22, 1, 0.36, 1)",
   inOut: "cubic-bezier(0.83, 0, 0.17, 1)",
   in: "cubic-bezier(0.55, 0, 1, 0.45)",
+  // Stronger UI curves (Emil Kowalski standards) — used for shell/interactions.
+  uiOut: "cubic-bezier(0.23, 1, 0.32, 1)",
+  drawer: "cubic-bezier(0.32, 0.72, 0, 1)",
+} as const;
+
+/**
+ * Apple-style spring — easier to reason about than stiffness/damping.
+ * Keep bounce subtle (0.1–0.3); reserve visible bounce for drag/playful UI.
+ */
+export const appleSpring = {
+  press: { type: "spring", duration: 0.4, bounce: 0.2 } as const,
+  cursor: { type: "spring", stiffness: 500, damping: 40, mass: 0.6 } as const,
+  cursorRing: {
+    type: "spring",
+    stiffness: 220,
+    damping: 26,
+    mass: 0.7,
+  } as const,
 } as const;
 
 /** Spring presets for Framer Motion — physical mass, never linear fades. */

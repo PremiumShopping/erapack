@@ -34,9 +34,11 @@
   --text-display: clamp(2rem, 4.5vw, 3.75rem);
   --text-display--line-height: 1.02;
 
-  /* — motion — */
-  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out-quart: cubic-bezier(0.83, 0, 0.17, 1);
+  /* — motion — strong custom curves (Emil Kowalski standards; the built-in
+     CSS easings are too weak). These also override Tailwind's ease-* utils. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* UI enter/exit — responsive */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* iOS-like drawer curve */
 }
 
 /* ================================================================== *

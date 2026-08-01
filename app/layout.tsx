@@ -3,6 +3,10 @@ import "./globals.css";
 import { fontVariables } from "@/lib/fonts";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import GrainOverlay from "@/components/fx/GrainOverlay";
+import CustomCursor from "@/components/fx/CustomCursor";
+import PromoBanner from "@/components/shell/PromoBanner";
+import SiteNav from "@/components/shell/SiteNav";
+import SiteFooter from "@/components/shell/SiteFooter";
 
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
@@ -33,9 +37,15 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-GB" className={`${fontVariables} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-paper text-ink">
+      <body className="bg-paper text-ink flex min-h-full flex-col">
         <GrainOverlay />
-        <SmoothScroll>{children}</SmoothScroll>
+        <CustomCursor />
+        <SmoothScroll>
+          <PromoBanner />
+          <SiteNav />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </SmoothScroll>
       </body>
     </html>
   );
