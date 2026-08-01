@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+/* ================================================================== *
+ *  ERA PACK — design tokens (Tailwind v4 @theme)
+ *  Mirror of lib/design-tokens.ts. Generates font-*, text-*, bg-* etc.
+ * ================================================================== */
+@theme {
+  /* — surfaces & ink — */
+  --color-paper: #f6f1e7;
+  --color-paper-2: #efe7d6;
+  --color-paper-3: #e7dcc6;
+  --color-kraft: #c8a97e;
+  --color-kraft-deep: #9c7b4e;
+  --color-ink: #2b2320;
+  --color-ink-soft: #6b5d50;
+  --color-charcoal: #17120f;
+  --color-charcoal-2: #221b16;
+
+  /* — THE accent — terracotta / kiln — */
+  --color-clay: #d24b27;
+  --color-clay-deep: #a83518;
+  --color-clay-glow: #e9714e;
+
+  /* — type — */
+  --font-display: var(--ff-display), Georgia, "Times New Roman", serif;
+  --font-sans: var(--ff-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--ff-mono), ui-monospace, "SF Mono", monospace;
+
+  /* — editorial display scale (clamped, fluid) — */
+  --text-mega: clamp(3.5rem, 11vw, 11rem);
+  --text-mega--line-height: 0.9;
+  --text-huge: clamp(2.5rem, 6.5vw, 6rem);
+  --text-huge--line-height: 0.95;
+  --text-display: clamp(2rem, 4.5vw, 3.75rem);
+  --text-display--line-height: 1.02;
+
+  /* — motion — */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+/* ================================================================== *
+ *  Base
+ * ================================================================== */
+:root {
+  color-scheme: light;
+  --grain-opacity: 0.055;
+}
+
+* {
+  border-color: color-mix(in oklab, var(--color-ink) 14%, transparent);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: auto; /* Lenis owns scrolling */
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+  overflow-x: hidden;
+}
+
+/* Lenis smooth-scroll wiring */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+::selection {
+  background-color: var(--color-clay);
+  color: var(--color-paper);
+}
+
+/* Warm, unobtrusive scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-kraft-deep);
+  border-radius: 999px;
+  border: 2px solid var(--color-paper-2);
+}
+
+/* ================================================================== *
+ *  Utility layer — the house vocabulary
+ * ================================================================== */
+@layer utilities {
+  /* Mono kicker / eyebrow label used above headings and on ledger rows */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-clay-deep);
+  }
+
+  .display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Hairline used on links / ledger rows */
+  .rule {
+    border-top: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+  }
+
+  /* Paper panel with a soft cardboard shadow (tactile, not glassmorphism) */
+  .card-paper {
+    background: var(--color-paper-2);
+    box-shadow:
+      0 1px 0 color-mix(in oklab, #fff 55%, transparent) inset,
+      0 18px 40px -24px color-mix(in oklab, var(--color-ink) 55%, transparent);
+  }
+
+  /* Hide the OS cursor when the custom cursor takes over (desktop only) */
+  @media (pointer: fine) {
+    .cursor-none-fine {
+      cursor: none;
+    }
+  }
+}
+
+/* ================================================================== *
+ *  Marquee
+ * ================================================================== */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.animate-marquee {
+  animation: marquee-x var(--marquee-duration, 26s) linear infinite;
+}
+
+/* ================================================================== *
+ *  Reduced motion — calm fallback everywhere
+ * ================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-marquee {
+    animation: none !important;
+  }
+}
