@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, type FileRejection } from "react-dropzone";
 import { Upload, Trash2, Plus, X, ImageIcon } from "lucide-react";
 import { useConfigurator, type CupSize } from "@/store/configurator";
 import { PRODUCTS } from "@/lib/products";
@@ -51,7 +51,7 @@ export default function ControlsPanel() {
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const onDrop = useCallback(
-    (accepted: File[], rejected: { errors: { code: string }[] }[]) => {
+    (accepted: File[], rejected: FileRejection[]) => {
       setUploadError(null);
       if (rejected.length) {
         setUploadError(

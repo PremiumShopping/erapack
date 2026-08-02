@@ -28,7 +28,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     lenis.on("scroll", ScrollTrigger.update);
 
     // Expose the instance for programmatic scrolling (anchor links, QA).
-    (window as Window & { lenis?: Lenis }).lenis = lenis;
+    (window as unknown as { lenis?: Lenis }).lenis = lenis;
 
     const raf = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(raf);
