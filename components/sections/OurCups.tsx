@@ -2,18 +2,12 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { PRODUCTS, CUP_TINTS, type CupSize } from "@/lib/products";
+import { PRODUCTS, SIZE_SCALE } from "@/lib/products";
 import { ease } from "@/lib/design-tokens";
-import CupGlyph from "@/components/ui/CupGlyph";
 import { gbp } from "@/lib/format";
 
-// glyph height steps up with volume — the row reads like a size chart
-const GLYPH_H: Record<CupSize, string> = {
-  "4oz": "h-14",
-  "6oz": "h-[4.75rem]",
-  "8oz": "h-24",
-  "12oz": "h-28",
-};
+// cups scale within this box, aligned to the base — the row reads like a size chart
+const GLYPH_BOX = 116;
 
 export default function OurCups() {
   return (
@@ -55,11 +49,19 @@ export default function OurCups() {
                   </span>
                 )}
                 <div className="flex items-end justify-between">
-                  <CupGlyph
-                    body={CUP_TINTS[p.size].body}
-                    band={CUP_TINTS[p.size].band}
-                    className={`${GLYPH_H[p.size]} w-auto`}
-                  />
+                  <div className="flex items-end" style={{ height: GLYPH_BOX }}>
+                    <div
+                      className="flex items-end"
+                      style={{ height: SIZE_SCALE[p.size] * GLYPH_BOX }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/cups/era-cup.png"
+                        alt={`ERA PACK ${p.size} cup`}
+                        className="h-full w-auto object-contain object-bottom"
+                      />
+                    </div>
+                  </div>
                   <span className="display text-ink text-3xl font-bold">
                     {p.size}
                   </span>
