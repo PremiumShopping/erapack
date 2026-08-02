@@ -7,12 +7,13 @@ export default function ClosingCTA() {
       <div className="mx-auto max-w-[1440px] px-6 py-24 md:px-12 md:py-32">
         <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-end">
           <div>
-            <p className="eyebrow !text-ink/60">Artwork help, no charge</p>
+            <p className="eyebrow !text-ink/60">Free 3D design studio</p>
             <h2 className="display text-ink text-huge mt-4 max-w-2xl font-bold">
-              Send us your logo. We&apos;ll send back a proof.
+              Design your cup in minutes.
             </h2>
             <p className="text-ink/75 mt-6 max-w-md text-lg leading-relaxed">
-              Let&apos;s make something worth holding.
+              Drop in your logo, colours and text right in the browser — no
+              back-and-forth. Let&apos;s make something worth holding.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 lg:justify-end">

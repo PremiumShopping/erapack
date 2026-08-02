@@ -3,14 +3,8 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
-import {
-  PRODUCTS,
-  PRODUCT_FEATURES,
-  CUP_TINTS,
-  SIZE_SCALE,
-} from "@/lib/products";
+import { PRODUCTS, PRODUCT_FEATURES, SIZE_SCALE } from "@/lib/products";
 import { ease } from "@/lib/design-tokens";
-import CupGlyph from "@/components/ui/CupGlyph";
 import { gbp } from "@/lib/format";
 
 const GLYPH_BOX = 132; // px — cups scale within this, aligned to the base
@@ -41,10 +35,11 @@ export default function ShopGrid() {
                 className="flex items-end"
                 style={{ height: SIZE_SCALE[p.size] * GLYPH_BOX }}
               >
-                <CupGlyph
-                  body={CUP_TINTS[p.size].body}
-                  band={CUP_TINTS[p.size].band}
-                  className="h-full w-auto"
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/cups/era-cup.png"
+                  alt={`ERA PACK ${p.size} cup`}
+                  className="h-full w-auto object-contain object-bottom"
                 />
               </div>
             </div>
