@@ -56,3 +56,24 @@ live erapack.uk that needs a human decision. Grouped by area.
     before the green re-skin). Regenerate with the green brand, or replace all
     AI hero media with real product photography.
 18. **Google "G" mark** usage for the reviews badge — confirm it's permitted.
+
+## Review follow-ups (non-blocking — from the M9 adversarial audit)
+
+The M9 review fixed the load-bearing issues (mobile scroll trap, focus, hydration,
+LCP image, video preload, brand defaults, product-card imagery, reduced-motion).
+These lower-priority polish items were consciously deferred:
+
+19. **Re-encode `espresso.mp4`** — download is now viewport-gated, but the file
+    is still ~11.5MB. Transcode to ~2–4MB (H.264 CRF ~26 at displayed size, add a
+    WebM/VP9 source) and shrink the 1.35MB poster. (No ffmpeg in this environment.)
+20. **`ClosingCTA`** is a centred two-button block repeated on 4 pages — vary or
+    left-align it against a cup visual to further reduce the "templated" read.
+21. **About values grid** repeats the homepage's four props as a flatter 4-up grid
+    — reuse the `WhyEraPack` numbered-editorial treatment and differentiate copy.
+22. **Shop "Compare the range" table** has three constant columns (Print/MOQ/
+    Delivery) — state those universal promises once and drop the non-varying columns.
+23. **Mobile menu sheet** (`SiteNav`) still lacks the focus-trap/restore treatment
+    now applied to the cart drawer.
+24. **Configurator re-render**: `Configurator`/`ControlsPanel` take whole-store
+    subscriptions; use selectors/`useShallow` so slider drags don't re-render the
+    whole tree (works fine today, just not optimal).
