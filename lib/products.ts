@@ -10,6 +10,7 @@ export type Product = {
   slug: string;
   name: string;
   price: string;
+  capacity: string;
   blurb: string;
   use: string;
   popular?: boolean;
@@ -21,6 +22,7 @@ export const PRODUCTS: Product[] = [
     slug: "4oz",
     name: "4oz Espresso",
     price: "£85.79",
+    capacity: "120ml",
     blurb: "Short and punchy — the perfect espresso and cortado cup.",
     use: "Espresso · Cortado",
   },
@@ -29,6 +31,7 @@ export const PRODUCTS: Product[] = [
     slug: "6oz",
     name: "6oz Cappuccino",
     price: "£142.55",
+    capacity: "175ml",
     blurb: "The morning classic. Room for milk and a proper crema.",
     use: "Cappuccino · Piccolo",
   },
@@ -37,6 +40,7 @@ export const PRODUCTS: Product[] = [
     slug: "8oz",
     name: "8oz Flat White",
     price: "£82.00",
+    capacity: "240ml",
     blurb: "The everyday hero — flat whites, teas, hot chocolate.",
     use: "Flat white · Tea",
     popular: true,
@@ -46,6 +50,7 @@ export const PRODUCTS: Product[] = [
     slug: "12oz",
     name: "12oz Latte",
     price: "£69.99",
+    capacity: "340ml",
     blurb: "Go large. Lattes, filter and everything to-go.",
     use: "Latte · Filter",
   },
