@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-import PagePlaceholder from "@/components/shell/PagePlaceholder";
+import Configurator from "@/components/configurator/Configurator";
 
 export const metadata: Metadata = {
   title: "Design your cup — live 3D",
   description:
-    "Upload a logo, add text and colours, and see your cup in real-time 3D.",
+    "Upload a logo, add text and colours, and see your custom paper cup in real-time 3D. Lock it in and order — no minimum, 2–3 day delivery.",
 };
 
 export default function DesignPage() {
-  return (
-    <PagePlaceholder
-      kicker="Design · Live 3D configurator"
-      title="Design your cup, in real time."
-      blurb="Pick a size, drop in your logo, set your colours and orbit a live 3D cup before you order. The configurator is the centrepiece — it's being engineered next."
-      milestone="Milestone 6"
-    />
-  );
+  return <Configurator />;
 }

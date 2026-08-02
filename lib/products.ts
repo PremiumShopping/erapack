@@ -5,8 +5,10 @@
  * odd ordering (6oz dearest, 12oz cheapest) implies these are NOT on the same
  * quantity basis. Confirm units + quantity breaks before launch.
  */
+export type CupSize = "4oz" | "6oz" | "8oz" | "12oz";
+
 export type Product = {
-  size: string;
+  size: CupSize;
   slug: string;
   name: string;
   price: string;
