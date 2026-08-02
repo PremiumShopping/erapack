@@ -1,14 +1,17 @@
 /**
- * Stylised paper-cup SVG used on product cards so the range always shows an
- * actual cup (not just a text size). `body` tints the paper, `band` the print.
+ * Stylised paper-cup SVG used across the range so a cup always shows an actual
+ * cup (not just a size). `body` tints the paper, `band` the printed wrap; with
+ * `brand` it carries the ERA PACK wordmark + leaf so the cup reads as branded.
  */
 export default function CupGlyph({
   body = "#FFFFFF",
   band = "#39FF14",
+  brand = true,
   className = "",
 }: {
   body?: string;
   band?: string;
+  brand?: boolean;
   className?: string;
 }) {
   const shape =
@@ -42,6 +45,27 @@ export default function CupGlyph({
         fill={band}
         clipPath="url(#era-cupclip)"
       />
+      {brand && (
+        <g clipPath="url(#era-cupclip)">
+          <text
+            x="58"
+            y="77"
+            textAnchor="middle"
+            fontSize="11"
+            fontWeight="800"
+            letterSpacing="0.2"
+            fill="#0F1211"
+            fontFamily="var(--font-display), sans-serif"
+          >
+            ERA PACK
+          </text>
+          <path
+            d="M92 66 q6 -4 10 0 q-4 6 -10 0 z"
+            fill="#0F1211"
+            opacity="0.85"
+          />
+        </g>
+      )}
       {/* rim */}
       <ellipse
         cx="60"

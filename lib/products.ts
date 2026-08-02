@@ -67,6 +67,14 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
+/** Relative cup HEIGHT per size (12oz = 1) so the range can be shown to scale. */
+export const SIZE_SCALE: Record<CupSize, number> = {
+  "4oz": 0.66,
+  "6oz": 0.77,
+  "8oz": 0.86,
+  "12oz": 1,
+};
+
 /** Volume tiers (discount curve verbatim from the 4oz page; consistent across sizes). */
 export const QTY_TIERS = [
   { qty: 1000, discount: 0 },
