@@ -29,7 +29,7 @@ const VALUES = [
 
 export default function WhyEraPack() {
   return (
-    <section className="bg-paper-2/70 backdrop-blur-md">
+    <section className="bg-paper-2">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-12 px-6 py-24 md:px-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         {/* left — heading (sticky on desktop) */}
         <div className="lg:sticky lg:top-28 lg:h-fit">

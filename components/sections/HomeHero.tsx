@@ -1,27 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Check, Star, Zap } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
-import { ease } from "@/lib/design-tokens";
-
-const lines: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
-const line: Variants = {
-  hidden: { y: "110%" },
-  show: { y: "0%", transition: { duration: 0.85, ease: ease.out } },
-};
-const fade: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  show: (d: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: ease.out, delay: 0.4 + d },
-  }),
-};
 
 function GoogleG({ className = "" }: { className?: string }) {
   return (
@@ -54,47 +35,39 @@ const BADGES = [
 
 export default function HomeHero() {
   return (
-    <section className="relative flex min-h-[88svh] flex-col items-center justify-center overflow-hidden px-6 py-20 text-center">
-      <motion.h1
-        variants={lines}
-        initial="hidden"
-        animate="show"
-        className="display text-mega text-ink font-extrabold"
-      >
-        <span className="block overflow-hidden">
-          <motion.span variants={line} className="block">
-            Your brand,
-          </motion.span>
-        </span>
-        <span className="block overflow-hidden">
-          <motion.span variants={line} className="block">
-            in{" "}
-            <span className="text-green-deep relative inline-block">
-              every
-              <span className="bg-green absolute inset-x-0 -bottom-1 h-[0.14em] rounded-full" />
-            </span>{" "}
-            cup.
-          </motion.span>
-        </span>
-      </motion.h1>
+    <section className="relative isolate flex min-h-[88svh] flex-col items-center justify-center overflow-hidden px-6 py-20 text-center">
+      {/* soft white halo so the centred content stays legible over the video */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 62% 52% at 50% 46%, rgba(255,255,255,0.82), rgba(255,255,255,0.35) 55%, transparent 74%)",
+        }}
+      />
 
-      <motion.p
-        variants={fade}
-        initial="hidden"
-        animate="show"
-        custom={0}
-        className="text-ink mt-7 max-w-xl text-lg leading-relaxed font-medium"
+      <h1 className="display text-mega text-ink rise-in font-extrabold">
+        Your brand,
+        <br />
+        in{" "}
+        <span className="text-green-deep relative inline-block">
+          every
+          <span className="bg-green absolute inset-x-0 -bottom-1 h-[0.14em] rounded-full" />
+        </span>{" "}
+        cup.
+      </h1>
+
+      <p
+        className="text-ink rise-in mt-7 max-w-xl text-lg leading-relaxed font-medium"
+        style={{ animationDelay: "0.12s" }}
       >
         Custom paper cups — direct from the manufacturer. No middlemen. Just
         high-quality cups, low minimum orders, and fast delivery.
-      </motion.p>
+      </p>
 
-      <motion.div
-        variants={fade}
-        initial="hidden"
-        animate="show"
-        custom={0.1}
-        className="mt-7 flex items-center gap-3"
+      <div
+        className="rise-in mt-7 flex items-center gap-3"
+        style={{ animationDelay: "0.2s" }}
       >
         <GoogleG className="h-6 w-6" />
         <span className="flex text-[#F5A623]" aria-label="Rated 5 out of 5">
@@ -103,14 +76,11 @@ export default function HomeHero() {
         <span className="text-ink text-sm font-semibold">
           Trusted by 700+ customers
         </span>
-      </motion.div>
+      </div>
 
-      <motion.div
-        variants={fade}
-        initial="hidden"
-        animate="show"
-        custom={0.2}
-        className="mt-9 flex flex-wrap items-center justify-center gap-4"
+      <div
+        className="rise-in mt-9 flex flex-wrap items-center justify-center gap-4"
+        style={{ animationDelay: "0.28s" }}
       >
         <Magnetic strength={0.3}>
           <Link
@@ -130,14 +100,11 @@ export default function HomeHero() {
         >
           Design your cup
         </Link>
-      </motion.div>
+      </div>
 
-      <motion.ul
-        variants={fade}
-        initial="hidden"
-        animate="show"
-        custom={0.3}
-        className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
+      <ul
+        className="rise-in mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
+        style={{ animationDelay: "0.36s" }}
       >
         {BADGES.map((b) => (
           <li key={b.label} className="flex items-center gap-2">
@@ -147,7 +114,7 @@ export default function HomeHero() {
             <span className="text-ink text-sm font-semibold">{b.label}</span>
           </li>
         ))}
-      </motion.ul>
+      </ul>
     </section>
   );
 }

@@ -11,7 +11,7 @@ import { gbp } from "@/lib/format";
 
 export default function OurCups() {
   return (
-    <section className="bg-paper/70 backdrop-blur-md">
+    <section className="bg-paper">
       <div className="mx-auto max-w-[1440px] px-6 py-24 md:px-12">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>

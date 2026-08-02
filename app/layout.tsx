@@ -4,7 +4,6 @@ import { fontVariables } from "@/lib/fonts";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import GrainOverlay from "@/components/fx/GrainOverlay";
 import CustomCursor from "@/components/fx/CustomCursor";
-import VideoBackground from "@/components/fx/VideoBackground";
 import PromoBanner from "@/components/shell/PromoBanner";
 import SiteNav from "@/components/shell/SiteNav";
 import SiteFooter from "@/components/shell/SiteFooter";
@@ -46,7 +45,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <VideoBackground />
         <GrainOverlay />
         <CustomCursor />
         <CartDrawer />
