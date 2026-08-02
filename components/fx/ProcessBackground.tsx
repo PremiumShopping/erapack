@@ -18,10 +18,10 @@ import { usePrefersReducedMotion, useHydrated } from "@/lib/useMediaQuery";
 type Beat = { src: string; t0: number; t1: number };
 
 const BEATS: Beat[] = [
-  { src: "/hero/process.mp4", t0: 0.0, t1: 0.42 }, // design (blank cup → green glow)
-  { src: "/hero/print.mp4", t0: 0.0, t1: 1.0 }, // print the band
-  { src: "/hero/deliver.mp4", t0: 0.0, t1: 1.0 }, // deliver
-  { src: "/hero/process.mp4", t0: 0.42, t1: 1.0 }, // fill with espresso
+  { src: "/hero/design.mp4", t0: 0.0, t1: 1.0 }, // designing the cup on the website
+  { src: "/hero/print.mp4", t0: 0.0, t1: 1.0 }, // production / printing
+  { src: "/hero/deliver.mp4", t0: 0.0, t1: 1.0 }, // delivery
+  { src: "/hero/fill.mp4", t0: 0.0, t1: 1.0 }, // espresso filled into the cup
 ];
 
 export default function ProcessBackground({
@@ -71,7 +71,7 @@ export default function ProcessBackground({
         if (!v.paused) v.pause();
         // smooth the scrub, and set currentTime explicitly so the frame paints
         const prev = shown[s] ?? c.t;
-        const next = prev + (c.t - prev) * 0.2;
+        const next = prev + (c.t - prev) * 0.32;
         shown[s] = next;
         if (v.readyState >= 1 && Math.abs((v.currentTime || 0) - next) > 0.01) {
           if (typeof v.fastSeek === "function") v.fastSeek(next);

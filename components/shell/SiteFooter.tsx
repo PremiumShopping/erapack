@@ -40,7 +40,7 @@ const SOCIALS = [
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-charcoal text-paper relative overflow-hidden">
+    <footer className="bg-charcoal/75 text-paper relative overflow-hidden">
       <div className="mx-auto w-full max-w-[1440px] px-6 pt-20 md:px-12">
         {/* newsletter + sustainability */}
         <div className="border-paper/12 grid grid-cols-1 gap-14 border-b pb-16 lg:grid-cols-2">

@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function ClosingCTA() {
   return (
-    <section className="bg-green text-ink">
+    <section className="bg-green/70 text-ink">
       <div className="mx-auto max-w-[1440px] px-6 py-24 text-center md:px-12 md:py-28">
         <p className="eyebrow !text-ink/60">Free design help included</p>
         <h2 className="display text-huge mx-auto mt-5 max-w-3xl font-extrabold">
