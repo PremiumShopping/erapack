@@ -8,7 +8,7 @@ import ClosingCTA from "@/components/sections/ClosingCTA";
 export default function Home() {
   return (
     <main>
-      <ProcessBackground poster="/hero/process-poster.png" scrim={0.18} />
+      <ProcessBackground poster="/scenes/cafe.png" scrim={0.12} />
       <HomeHero />
       <StatsBand />
       <WhyEraPack />

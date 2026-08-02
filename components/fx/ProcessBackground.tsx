@@ -16,14 +16,11 @@ import { usePrefersReducedMotion, useHydrated } from "@/lib/useMediaQuery";
  * play, or we advance currentTime ourselves so it still moves in Safari).
  * Reduced motion → a static poster.
  */
-const CLIPS = [
-  "/hero/design.mp4",
-  "/hero/print.mp4",
-  "/hero/deliver.mp4",
-  "/hero/fill.mp4",
-];
-const SEG = 5.5; // seconds a scene holds
-const TR = 0.36; // fraction of a segment spent dissolving to the next scene
+// Real stock footage (Mixkit free licence) — a genuine latte being poured;
+// warm tones that sit with the paper-stock palette. A single looping clip.
+const CLIPS = ["/hero/cappuccino.mp4"];
+const SEG = 8; // seconds a scene holds
+const TR = 0.4; // fraction of a segment spent dissolving to the next scene
 
 const smooth = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
