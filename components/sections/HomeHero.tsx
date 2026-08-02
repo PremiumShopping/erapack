@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Check, Star, Zap } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
 import { ease } from "@/lib/design-tokens";
+
+const HeroCup = dynamic(() => import("@/components/three/HeroCupCanvas"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const lines: Variants = {
   hidden: {},
@@ -56,9 +61,32 @@ const BADGES = [
 export default function HomeHero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-12 px-6 py-14 md:px-12 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:py-20">
-        {/* left — copy */}
-        <div>
+      {/* live 3D cup — full-bleed on mobile, biased right on desktop */}
+      <div className="absolute inset-y-0 right-0 h-full w-full lg:w-[64%]">
+        <HeroCup />
+      </div>
+
+      {/* legibility scrims: keep the left (text) clean white */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 hidden lg:block"
+        style={{
+          background:
+            "linear-gradient(90deg, #fff 0%, #fff 24%, rgba(255,255,255,0.82) 40%, rgba(255,255,255,0) 62%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 lg:hidden"
+        style={{
+          background:
+            "linear-gradient(to bottom, #fff 0%, rgba(255,255,255,0.72) 34%, rgba(255,255,255,0) 60%)",
+        }}
+      />
+
+      {/* content (pointer-events pass through to the cup except on controls) */}
+      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[78svh] w-full max-w-[1440px] flex-col justify-start px-6 pt-14 pb-16 md:px-12 lg:min-h-[86svh] lg:justify-center lg:py-20">
+        <div className="max-w-xl">
           <motion.h1
             variants={lines}
             initial="hidden"
@@ -87,7 +115,7 @@ export default function HomeHero() {
             initial="hidden"
             animate="show"
             custom={0}
-            className="text-ink-soft mt-7 max-w-xl text-lg leading-relaxed"
+            className="text-ink-soft mt-7 max-w-md text-lg leading-relaxed"
           >
             Custom paper cups — direct from the manufacturer. No middlemen. Just
             high-quality cups, low minimum orders, and fast delivery.
@@ -110,13 +138,13 @@ export default function HomeHero() {
             </span>
           </motion.div>
 
-          {/* CTAs */}
+          {/* CTAs — re-enable pointer events */}
           <motion.div
             variants={fade}
             initial="hidden"
             animate="show"
             custom={0.2}
-            className="mt-9 flex flex-wrap items-center gap-4"
+            className="pointer-events-auto mt-9 flex flex-wrap items-center gap-4"
           >
             <Magnetic strength={0.3}>
               <Link
@@ -159,31 +187,10 @@ export default function HomeHero() {
           </motion.ul>
         </div>
 
-        {/* right — product montage */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.9, ease: ease.out, delay: 0.25 }}
-          className="relative"
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 mx-auto h-4/5 w-4/5 translate-y-6 rounded-full opacity-60 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle at center, rgba(57,255,20,0.22), transparent 65%)",
-            }}
-          />
-          <Image
-            src="/hero/cups-montage.png"
-            alt="A lineup of custom-branded Era Pack paper cups"
-            width={1200}
-            height={896}
-            priority
-            sizes="(min-width: 1024px) 45vw, 100vw"
-            className="h-auto w-full object-contain drop-shadow-[0_30px_50px_rgba(15,18,17,0.12)]"
-          />
-        </motion.div>
+        {/* subtle hint that the cup is interactive (desktop) */}
+        <p className="text-ink-soft/60 pointer-events-none absolute right-8 bottom-6 hidden font-mono text-[11px] tracking-[0.2em] uppercase lg:block">
+          Drag the cup ↻
+        </p>
       </div>
     </section>
   );
