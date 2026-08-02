@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { PRODUCTS } from "@/lib/products";
 import { ease } from "@/lib/design-tokens";
+import CupGlyph from "@/components/ui/CupGlyph";
+import { CUP_TINTS } from "@/lib/products";
 
 export default function OurCups() {
   return (
@@ -52,8 +54,15 @@ export default function OurCups() {
                   </span>
                 )}
                 <div>
-                  <div className="display text-ink text-6xl font-extrabold">
-                    {p.size}
+                  <div className="mb-4 flex items-center justify-between">
+                    <CupGlyph
+                      body={CUP_TINTS[p.size].body}
+                      band={CUP_TINTS[p.size].band}
+                      className="h-24 w-auto"
+                    />
+                    <span className="display text-ink text-3xl font-extrabold">
+                      {p.size}
+                    </span>
                   </div>
                   <p className="text-green-deep mt-1 text-sm font-semibold">
                     {p.use}

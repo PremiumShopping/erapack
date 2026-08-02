@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
   OrbitControls,
   Environment,
@@ -10,9 +10,11 @@ import {
   ContactShadows,
 } from "@react-three/drei";
 import { useConfigurator } from "@/store/configurator";
+import { useFinePointer, useMediaQuery } from "@/lib/useMediaQuery";
 import { drawCupArtwork, ART_W, ART_H, CUP_DIMS } from "@/lib/cupArtwork";
 
-function Cup() {
+function Cup({ spin }: { spin: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
   const config = useConfigurator();
   const { size, baseColor, logoDataUrl } = config;
   const [logoImg, setLogoImg] = useState<HTMLImageElement | null>(null);
@@ -58,12 +60,16 @@ function Cup() {
 
   useEffect(() => () => texture.dispose(), [texture]);
 
+  useFrame((_, dt) => {
+    if (spin && groupRef.current) groupRef.current.rotation.y += dt * 0.35;
+  });
+
   const { H, rTop, rBot } = CUP_DIMS[size];
   const inTop = rTop * 0.95;
   const inBot = rBot * 0.95;
 
   return (
-    <group>
+    <group ref={groupRef}>
       {/* body — printed wrap */}
       <mesh castShadow>
         <cylinderGeometry args={[rTop, rBot, H, 96, 1, true]} />
@@ -100,6 +106,9 @@ export default function ConfiguratorCanvas({
 }: {
   onReady?: (gl: THREE.WebGLRenderer) => void;
 }) {
+  const fine = useFinePointer();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   // Nudge R3F to remeasure after mount (covers 0-size-at-mount edge cases).
   useEffect(() => {
     const raf = requestAnimationFrame(() =>
@@ -111,7 +120,7 @@ export default function ConfiguratorCanvas({
   return (
     <Canvas
       shadows
-      dpr={[1, 2]}
+      dpr={isMobile ? [1, 1.5] : [1, 2]}
       gl={{
         antialias: true,
         alpha: true,
@@ -130,7 +139,7 @@ export default function ConfiguratorCanvas({
         shadow-bias={-0.0002}
       />
       <Suspense fallback={null}>
-        <Cup />
+        <Cup spin={!fine} />
         <Environment resolution={256}>
           <Lightformer
             form="rect"
@@ -158,17 +167,19 @@ export default function ConfiguratorCanvas({
         />
       </Suspense>
 
-      <OrbitControls
-        enablePan={false}
-        minDistance={2.4}
-        maxDistance={5.5}
-        minPolarAngle={Math.PI * 0.15}
-        maxPolarAngle={Math.PI * 0.82}
-        enableDamping
-        dampingFactor={0.08}
-        autoRotate
-        autoRotateSpeed={0.6}
-      />
+      {/* Manual orbit/zoom only on fine pointers — on touch the canvas keeps
+          default touch-action so the page scrolls (the cup self-rotates). */}
+      {fine && (
+        <OrbitControls
+          enablePan={false}
+          minDistance={2.4}
+          maxDistance={5.5}
+          minPolarAngle={Math.PI * 0.15}
+          maxPolarAngle={Math.PI * 0.82}
+          enableDamping
+          dampingFactor={0.08}
+        />
+      )}
     </Canvas>
   );
 }

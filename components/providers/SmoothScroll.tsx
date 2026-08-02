@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { MotionConfig } from "framer-motion";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
@@ -40,5 +41,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <>{children}</>;
+  // reducedMotion="user" makes Framer Motion auto-disable transform/opacity
+  // entrance animations when the user prefers reduced motion.
+  return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
 }

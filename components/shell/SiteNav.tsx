@@ -8,6 +8,7 @@ import { ChevronDown, Leaf, Menu, ShoppingBag, X } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
 import { useUI } from "@/store/ui";
 import { useCart, cartCount } from "@/store/cart";
+import { useHydrated } from "@/lib/useMediaQuery";
 
 const MAIN = [
   { href: "/shop", label: "Shop" },
@@ -27,7 +28,9 @@ const ABOUT = [
 export default function SiteNav() {
   const pathname = usePathname();
   const openCart = useUI((s) => s.openCart);
-  const count = useCart((s) => cartCount(s.items));
+  const hydrated = useHydrated();
+  const rawCount = useCart((s) => cartCount(s.items));
+  const count = hydrated ? rawCount : 0; // avoid SSR/persist hydration mismatch
   const [scrolled, setScrolled] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -102,7 +105,7 @@ export default function SiteNav() {
             <Link
               key={l.href}
               href={l.href}
-              className="group text-ink hover:text-clay relative text-[15px] font-medium transition-colors duration-200 ease-out"
+              className="group text-ink hover:text-green-deep relative text-[15px] font-medium transition-colors duration-200 ease-out"
             >
               {l.label}
               <span
@@ -124,7 +127,7 @@ export default function SiteNav() {
               aria-expanded={aboutOpen}
               aria-haspopup="menu"
               onClick={() => setAboutOpen((v) => !v)}
-              className="text-ink hover:text-clay flex items-center gap-1 text-[15px] font-medium transition-colors duration-200 ease-out"
+              className="text-ink hover:text-green-deep flex items-center gap-1 text-[15px] font-medium transition-colors duration-200 ease-out"
             >
               About
               <ChevronDown
@@ -138,7 +141,6 @@ export default function SiteNav() {
             <AnimatePresence>
               {aboutOpen && (
                 <motion.div
-                  role="menu"
                   initial={{ opacity: 0, y: -8, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
@@ -150,7 +152,6 @@ export default function SiteNav() {
                     <Link
                       key={a.href}
                       href={a.href}
-                      role="menuitem"
                       className="hover:bg-paper-3 block rounded-xl px-4 py-3 transition-colors duration-150 ease-out"
                     >
                       <span className="text-ink block text-[15px] font-medium">
@@ -171,7 +172,7 @@ export default function SiteNav() {
         <div className="flex items-center gap-3 md:gap-5">
           <Link
             href="/login"
-            className="text-ink hover:text-clay hidden text-[15px] font-medium transition-colors duration-200 ease-out sm:block"
+            className="text-ink hover:text-green-deep hidden text-[15px] font-medium transition-colors duration-200 ease-out sm:block"
           >
             Log in
           </Link>
@@ -278,7 +279,7 @@ export default function SiteNav() {
                 >
                   <Link
                     href={a.href}
-                    className="text-ink-soft hover:text-clay block py-2 text-lg transition-colors"
+                    className="text-ink-soft hover:text-green-deep block py-2 text-lg transition-colors"
                   >
                     {a.label}
                   </Link>

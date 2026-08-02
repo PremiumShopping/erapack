@@ -94,7 +94,11 @@ export default function LoginPage() {
                 className="border-ink/15 bg-paper text-ink focus:border-green w-full rounded-xl border px-4 py-3 focus:outline-none"
               />
             </label>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+              <p role="alert" className="text-sm text-red-600">
+                {error}
+              </p>
+            )}
             <button
               type="submit"
               className="bg-green text-ink w-full rounded-full px-6 py-4 text-base font-bold transition-transform duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.98]"

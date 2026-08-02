@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Check, Star, Zap } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
@@ -173,11 +174,14 @@ export default function HomeHero() {
                 "radial-gradient(circle at center, rgba(57,255,20,0.22), transparent 65%)",
             }}
           />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/hero/cups-montage.png"
             alt="A lineup of custom-branded Era Pack paper cups"
-            className="w-full object-contain drop-shadow-[0_30px_50px_rgba(15,18,17,0.12)]"
+            width={1200}
+            height={896}
+            priority
+            sizes="(min-width: 1024px) 45vw, 100vw"
+            className="h-auto w-full object-contain drop-shadow-[0_30px_50px_rgba(15,18,17,0.12)]"
           />
         </motion.div>
       </div>

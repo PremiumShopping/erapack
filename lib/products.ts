@@ -67,3 +67,11 @@ export const PRODUCT_FEATURES = [
 ];
 
 export const FREE_SHIPPING_THRESHOLD = 100; // £ — free UK shipping over this
+
+/** Per-size cup tints for the product-card glyph (brand palette). */
+export const CUP_TINTS: Record<CupSize, { body: string; band: string }> = {
+  "4oz": { body: "#EFE6D3", band: "#1A1A1A" },
+  "6oz": { body: "#FFFFFF", band: "#39FF14" },
+  "8oz": { body: "#DFF7D0", band: "#1FBF07" },
+  "12oz": { body: "#1A1A1A", band: "#39FF14" },
+};

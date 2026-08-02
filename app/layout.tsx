@@ -39,13 +39,21 @@ export default function RootLayout({
   return (
     <html lang="en-GB" className={`${fontVariables} h-full antialiased`}>
       <body className="bg-paper text-ink flex min-h-full flex-col">
+        <a
+          href="#main-content"
+          className="focus:bg-ink focus:text-paper sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:px-5 focus:py-2 focus:text-sm focus:font-bold"
+        >
+          Skip to content
+        </a>
         <GrainOverlay />
         <CustomCursor />
         <CartDrawer />
         <SmoothScroll>
           <PromoBanner />
           <SiteNav />
-          <div className="flex-1">{children}</div>
+          <div id="main-content" className="flex-1">
+            {children}
+          </div>
           <SiteFooter />
         </SmoothScroll>
       </body>

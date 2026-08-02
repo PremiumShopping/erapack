@@ -102,7 +102,9 @@ export default function CheckoutPage() {
     }
   }
 
-  if (hydrated && items.length === 0) {
+  if (!hydrated) return <main className="min-h-[60vh]" />;
+
+  if (items.length === 0) {
     return (
       <main className="mx-auto max-w-[1440px] px-6 py-24 text-center md:px-12">
         <h1 className="display text-huge text-ink font-extrabold">
@@ -254,7 +256,11 @@ export default function CheckoutPage() {
             </div>
           </dl>
 
-          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+          {error && (
+            <p role="alert" className="mt-4 text-sm text-red-600">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"

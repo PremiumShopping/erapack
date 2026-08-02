@@ -57,7 +57,9 @@ export default function NewsletterForm() {
         </button>
       </div>
       {error ? (
-        <p className="text-clay-glow mt-2 text-sm">{error}</p>
+        <p role="alert" className="text-clay-glow mt-2 text-sm">
+          {error}
+        </p>
       ) : (
         <p className="text-paper/50 mt-2 text-sm">
           Occasional notes on new sizes, lead times and design ideas. No spam.

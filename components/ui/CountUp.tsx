@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView } from "framer-motion";
+import { useInView, useReducedMotion } from "framer-motion";
 
 /** Counts up to `to` once it scrolls into view (ease-out cubic). */
 export default function CountUp({
@@ -17,10 +17,11 @@ export default function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const reduced = useReducedMotion();
   const [val, setVal] = useState(0);
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || reduced) return;
     let raf = 0;
     const start = performance.now();
     const tick = (t: number) => {
@@ -31,12 +32,12 @@ export default function CountUp({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [inView, to, duration]);
+  }, [inView, reduced, to, duration]);
 
   return (
     <span ref={ref}>
       {prefix}
-      {val.toLocaleString("en-GB")}
+      {(reduced ? to : val).toLocaleString("en-GB")}
       {suffix}
     </span>
   );

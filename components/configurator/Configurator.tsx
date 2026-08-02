@@ -9,6 +9,7 @@ import ControlsPanel from "@/components/configurator/ControlsPanel";
 import { useConfigurator } from "@/store/configurator";
 import { useCart } from "@/store/cart";
 import { PRODUCTS } from "@/lib/products";
+import { useHydrated } from "@/lib/useMediaQuery";
 
 const ConfiguratorCanvas = dynamic(
   () => import("@/components/three/ConfiguratorCanvas"),
@@ -33,6 +34,7 @@ export default function Configurator() {
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const hydrated = useHydrated();
 
   const product = PRODUCTS.find((p) => p.size === config.size);
 
@@ -73,6 +75,9 @@ export default function Configurator() {
     });
     setAdded(true);
   };
+
+  // Gate persisted-config rendering until hydration (avoids SSR mismatch).
+  if (!hydrated) return <div className="min-h-[80svh]" />;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr]">

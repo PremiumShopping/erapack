@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollTrigger } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/lib/useMediaQuery";
 
@@ -48,6 +48,19 @@ export default function ScrollVideoHero({
   const videoRef = useRef<HTMLVideoElement>(null);
   const captionsRef = useRef<Array<HTMLDivElement | null>>([]);
   const reduced = usePrefersReducedMotion();
+  const [nearby, setNearby] = useState(false);
+
+  // Only fetch the (heavy) hero video once the section is near the viewport.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => e.isIntersecting && setNearby(true),
+      { rootMargin: "600px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (reduced) return;
@@ -147,20 +160,29 @@ export default function ScrollVideoHero({
       <div ref={pinRef} className="relative h-svh overflow-hidden">
         <video
           ref={videoRef}
-          src={src}
+          src={nearby ? src : undefined}
           poster={poster}
           muted
           playsInline
-          preload="auto"
+          preload={nearby ? "auto" : "none"}
           className="absolute inset-0 h-full w-full object-cover"
         />
-        {/* legibility scrim */}
+        {/* legibility scrim — left-anchored on desktop where the caption sits */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 hidden md:block"
           style={{
             background:
               "linear-gradient(90deg, rgba(23,18,15,0.72) 0%, rgba(23,18,15,0.35) 42%, transparent 70%)",
+          }}
+        />
+        {/* bottom-anchored scrim on mobile where the caption is full-width */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 md:hidden"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(23,18,15,0.82) 0%, rgba(23,18,15,0.3) 45%, transparent 65%)",
           }}
         />
 

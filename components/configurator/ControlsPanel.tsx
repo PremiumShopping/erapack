@@ -9,14 +9,14 @@ import { PRODUCTS } from "@/lib/products";
 const SIZES: CupSize[] = ["4oz", "6oz", "8oz", "12oz"];
 
 const BASE_SWATCHES = [
-  "#F4EEE1",
   "#FFFFFF",
-  "#C8A97E",
+  "#F4EEE1",
   "#1A1A1A",
   "#39FF14",
   "#14532D",
-  "#D2552A",
   "#1E3A8A",
+  "#C8A97E",
+  "#E11D48",
 ];
 
 const PRESETS: {
@@ -25,8 +25,8 @@ const PRESETS: {
   textColor: string;
   text?: string;
 }[] = [
-  { name: "Kraft", base: "#C8A97E", textColor: "#2B2320", text: "FRESH" },
-  { name: "Cream", base: "#F4EEE1", textColor: "#1A1A1A", text: "DAILY" },
+  { name: "Clean", base: "#FFFFFF", textColor: "#0F1211", text: "BREW" },
+  { name: "Electric", base: "#FFFFFF", textColor: "#1FBF07", text: "FRESH" },
   { name: "Midnight", base: "#1A1A1A", textColor: "#39FF14", text: "LATE" },
   { name: "Eco green", base: "#DFF7D0", textColor: "#14532D", text: "GREEN" },
 ];
@@ -133,6 +133,7 @@ export default function ControlsPanel() {
           <label className="border-ink/40 relative h-9 w-9 cursor-pointer overflow-hidden rounded-full border border-dashed">
             <input
               type="color"
+              aria-label="Custom cup colour"
               value={c.baseColor}
               onChange={(e) => c.setBaseColor(e.target.value)}
               className="absolute -inset-2 h-[calc(100%+1rem)] w-[calc(100%+1rem)] cursor-pointer"

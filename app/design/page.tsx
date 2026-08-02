@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function DesignPage() {
-  return <Configurator />;
+  return (
+    <main>
+      <Configurator />
+    </main>
+  );
 }

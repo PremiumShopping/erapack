@@ -119,6 +119,7 @@ export default function ContactPage() {
                 <select
                   value={form.help}
                   onChange={set("help")}
+                  required
                   className="border-ink/15 bg-paper text-ink focus:border-green w-full rounded-xl border px-4 py-3 focus:outline-none"
                 >
                   <option value="">Select an option</option>
@@ -138,10 +139,15 @@ export default function ContactPage() {
                 value={form.details}
                 onChange={set("details")}
                 rows={5}
+                required
                 className="border-ink/15 bg-paper text-ink focus:border-green w-full rounded-xl border px-4 py-3 focus:outline-none"
               />
             </label>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+              <p role="alert" className="text-sm text-red-600">
+                {error}
+              </p>
+            )}
             <button
               type="submit"
               className="bg-green text-ink rounded-full px-8 py-4 text-base font-bold transition-transform duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.98]"
@@ -198,6 +204,7 @@ function Input({
       </span>
       <input
         {...props}
+        required={required}
         className="border-ink/15 bg-paper text-ink focus:border-green w-full rounded-xl border px-4 py-3 focus:outline-none"
       />
     </label>

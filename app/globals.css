@@ -50,7 +50,7 @@
  * ================================================================== */
 :root {
   color-scheme: light;
-  --grain-opacity: 0.03;
+  --grain-opacity: 0.016;
 }
 
 * {
@@ -87,6 +87,22 @@ html.lenis body {
 ::selection {
   background-color: var(--color-green);
   color: var(--color-ink);
+}
+
+/* Visible keyboard focus everywhere. Unlayered so it wins over Tailwind's
+   focus:outline-none utilities (which live in @layer utilities). */
+:is(
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  summary,
+  [role="button"],
+  [tabindex]
+):focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
 }
 
 /* Warm, unobtrusive scrollbar */

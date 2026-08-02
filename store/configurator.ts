@@ -50,7 +50,7 @@ const uid = () =>
 
 const DEFAULT: CupConfig = {
   size: "8oz",
-  baseColor: "#F4EEE1",
+  baseColor: "#FFFFFF",
   logoDataUrl: null,
   logoScale: 0.6,
   logoX: 0.5,
@@ -98,6 +98,6 @@ export const useConfigurator = create<ConfigStore>()(
       unlock: () => set({ locked: false }),
       reset: () => set({ ...DEFAULT }),
     }),
-    { name: "erapack:design" },
+    { name: "erapack:design-v2" },
   ),
 );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ShoppingBag, Trash2, ArrowRight } from "lucide-react";
@@ -19,11 +19,24 @@ export default function CartDrawer() {
   const toFree = Math.max(0, FREE_SHIPPING - subtotal);
   const progress = Math.min(100, (subtotal / FREE_SHIPPING) * 100);
 
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const lastFocused = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeCart();
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = cartOpen ? "hidden" : "";
-    return () => window.removeEventListener("keydown", onKey);
+    let raf = 0;
+    if (cartOpen) {
+      lastFocused.current = document.activeElement as HTMLElement | null;
+      raf = requestAnimationFrame(() => closeRef.current?.focus());
+    } else {
+      lastFocused.current?.focus?.();
+    }
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      cancelAnimationFrame(raf);
+    };
   }, [cartOpen, closeCart]);
 
   return (
@@ -40,6 +53,7 @@ export default function CartDrawer() {
           />
           <motion.aside
             role="dialog"
+            aria-modal="true"
             aria-label="Cart"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -52,6 +66,7 @@ export default function CartDrawer() {
                 Your cart
               </h2>
               <button
+                ref={closeRef}
                 onClick={closeCart}
                 aria-label="Close cart"
                 className="text-ink-soft hover:bg-ink/5 hover:text-ink grid h-9 w-9 place-items-center rounded-full"
@@ -135,7 +150,7 @@ export default function CartDrawer() {
                             <button
                               aria-label="Decrease"
                               onClick={() => setQty(it.id, it.qty - 1)}
-                              className="border-ink/20 text-ink hover:border-ink/40 grid h-7 w-7 place-items-center rounded-full border"
+                              className="border-ink/20 text-ink hover:border-ink/40 grid h-9 w-9 place-items-center rounded-full border"
                             >
                               −
                             </button>
@@ -145,7 +160,7 @@ export default function CartDrawer() {
                             <button
                               aria-label="Increase"
                               onClick={() => setQty(it.id, it.qty + 1)}
-                              className="border-ink/20 text-ink hover:border-ink/40 grid h-7 w-7 place-items-center rounded-full border"
+                              className="border-ink/20 text-ink hover:border-ink/40 grid h-9 w-9 place-items-center rounded-full border"
                             >
                               +
                             </button>
