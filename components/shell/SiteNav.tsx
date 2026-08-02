@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Menu, ShoppingBag, X } from "lucide-react";
+import { ChevronDown, Leaf, Menu, ShoppingBag, X } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
 
 const MAIN = [
@@ -82,10 +82,13 @@ export default function SiteNav() {
         <Magnetic strength={0.5}>
           <Link
             href="/"
-            className="display text-ink text-2xl font-semibold tracking-tight"
+            className="text-ink flex items-center gap-1.5"
             data-cursor="Home"
           >
-            Era<span className="text-clay">Pack</span>
+            <Leaf className="text-green-deep" size={22} strokeWidth={2.5} />
+            <span className="display text-2xl font-extrabold tracking-tight">
+              EraPack
+            </span>
           </Link>
         </Magnetic>
 
@@ -204,8 +207,11 @@ export default function SiteNav() {
             className="bg-paper fixed inset-0 z-[60] lg:hidden"
           >
             <div className="flex items-center justify-between px-6 py-4">
-              <span className="display text-ink text-2xl font-semibold tracking-tight">
-                Era<span className="text-clay">Pack</span>
+              <span className="text-ink flex items-center gap-1.5">
+                <Leaf className="text-green-deep" size={22} strokeWidth={2.5} />
+                <span className="display text-2xl font-extrabold tracking-tight">
+                  EraPack
+                </span>
               </span>
               <button
                 type="button"

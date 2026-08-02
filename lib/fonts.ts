@@ -1,24 +1,15 @@
 /**
- * Type system — loaded via next/font (self-hosted, no external requests).
- *
- * Display : Fraunces        — editorial "old-style" serif with optical size,
- *                              SOFT + WONK axes. Warm, characterful, artisanal.
- * Sans    : Hanken Grotesk  — humanist grotesque for body. Readable, not Inter.
- * Mono    : Space Mono      — technical eyebrows / spec labels / the "factory"
- *                              register (counters, kickers, ledger rows).
+ * Type system — inherited from the real erapack.uk, which uses **Assistant**
+ * (Google Fonts) for both headings and body. Self-hosted via next/font.
+ * Space Mono is kept only for small technical/spec labels (craft accents).
  */
-import { Fraunces, Hanken_Grotesk, Space_Mono } from "next/font/google";
+import { Assistant, Space_Mono } from "next/font/google";
 
-export const displayFont = Fraunces({
+// Single brand face for display + body (matches the live site).
+export const brandFont = Assistant({
   subsets: ["latin"],
-  variable: "--ff-display",
-  display: "swap",
-  style: ["normal", "italic"],
-});
-
-export const sansFont = Hanken_Grotesk({
-  subsets: ["latin"],
-  variable: "--ff-sans",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--ff-brand",
   display: "swap",
 });
 
@@ -29,5 +20,5 @@ export const monoFont = Space_Mono({
   display: "swap",
 });
 
-/** Convenience: all font CSS-variable classes for the <html> element. */
-export const fontVariables = `${displayFont.variable} ${sansFont.variable} ${monoFont.variable}`;
+/** All font CSS-variable classes for the <html> element. */
+export const fontVariables = `${brandFont.variable} ${monoFont.variable}`;

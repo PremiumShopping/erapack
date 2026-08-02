@@ -89,7 +89,7 @@ export default function CustomCursor() {
           style={{ transform: ringTransform }}
           className="absolute top-0 left-0"
         >
-          <span className="bg-clay text-paper mt-4 ml-5 inline-block rounded-full px-2.5 py-1 font-mono text-[10px] tracking-widest whitespace-nowrap uppercase">
+          <span className="bg-green text-ink mt-4 ml-5 inline-block rounded-full px-2.5 py-1 font-mono text-[10px] tracking-widest whitespace-nowrap uppercase">
             {label}
           </span>
         </motion.div>

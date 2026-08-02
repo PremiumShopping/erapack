@@ -11,20 +11,23 @@
  */
 
 export const colors = {
-  paper: "#F6F1E7", // base off-white, the "unprinted stock"
-  paper2: "#EFE7D6", // slightly deeper paper for panels / alternating sections
-  paper3: "#E7DCC6", // pressed paper, hairline fills
-  kraft: "#C8A97E", // kraft board
-  kraftDeep: "#9C7B4E", // kraft in shadow, secondary strokes
-  ink: "#2B2320", // espresso ink — primary text
-  inkSoft: "#6B5D50", // muted ink — captions, meta
-  charcoal: "#17120F", // the dark "how it's made" register
-  charcoal2: "#221B16", // charcoal panel
-  clay: "#D24B27", // ⭐ THE accent — terracotta / kiln
-  clayDeep: "#A83518", // accent pressed / hover
-  clayGlow: "#E9714E", // accent highlight (sparingly)
-  line: "rgba(43, 35, 32, 0.14)", // hairline on paper
-  lineDark: "rgba(246, 241, 231, 0.16)", // hairline on charcoal
+  paper: "#FFFFFF", // white base (inherited from erapack.uk)
+  paper2: "#F4F6F2", // soft off-white section band
+  paper3: "#E9EDE7", // pressed paper, hairline fills
+  kraft: "#CDEEC6", // pale-green tint (soft accent surface)
+  kraftDeep: "#7AD86A", // mid green
+  ink: "#0F1211", // near-black — primary text
+  inkSoft: "#57605A", // muted grey — captions, meta
+  charcoal: "#0D0F0D", // the single dark register (video / footer)
+  charcoal2: "#171A16", // charcoal panel
+  green: "#39FF14", // ⭐ THE accent — electric green
+  greenDeep: "#1FBF07", // accent hover / contrast
+  greenSoft: "#67FF47", // accent highlight
+  clay: "#39FF14", // alias of green (kept so existing utilities re-skin)
+  clayDeep: "#1FBF07",
+  clayGlow: "#67FF47",
+  line: "rgba(15, 18, 17, 0.12)", // hairline on white
+  lineDark: "rgba(255, 255, 255, 0.16)", // hairline on charcoal
 } as const;
 
 /**

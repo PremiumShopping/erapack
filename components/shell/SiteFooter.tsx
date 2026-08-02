@@ -49,8 +49,7 @@ export default function SiteFooter() {
               Keep in the loop
             </p>
             <h2 className="display mt-4 max-w-md text-4xl leading-[1.05] font-semibold md:text-5xl">
-              Good cups,{" "}
-              <span className="text-kraft italic">now and then.</span>
+              Good cups, <span className="text-green">now and then.</span>
             </h2>
             <div className="mt-8">
               <NewsletterForm />
@@ -80,7 +79,7 @@ export default function SiteFooter() {
               href="/"
               className="display text-3xl font-semibold tracking-tight"
             >
-              Era<span className="text-clay">Pack</span>
+              Era<span className="text-green">Pack</span>
             </Link>
             <p className="text-paper/55 mt-4 max-w-xs text-sm leading-relaxed">
               Custom-branded paper cups, printed factory-direct in the UK. Your

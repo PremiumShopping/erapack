@@ -2,66 +2,67 @@
 
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
-import Marquee from "@/components/fx/Marquee";
+import { ArrowRight, Check, Star, Zap } from "lucide-react";
+import Magnetic from "@/components/ui/Magnetic";
 import { ease } from "@/lib/design-tokens";
 
-/* Line-mask reveal: each line rises out of an overflow-hidden clip. */
 const lines: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.11, delayChildren: 0.15 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 };
 const line: Variants = {
-  hidden: { y: "116%" },
-  show: { y: "0%", transition: { duration: 0.95, ease: ease.out } },
+  hidden: { y: "110%" },
+  show: { y: "0%", transition: { duration: 0.85, ease: ease.out } },
 };
 const fade: Variants = {
   hidden: { opacity: 0, y: 18 },
-  show: {
+  show: (d: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: ease.out, delay: 0.65 },
-  },
+    transition: { duration: 0.6, ease: ease.out, delay: 0.45 + d },
+  }),
 };
 
-function Stars() {
+function GoogleG({ className = "" }: { className?: string }) {
   return (
-    <span className="text-clay" aria-label="5 out of 5 stars">
-      ★★★★★
-    </span>
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <path
+        fill="#4285F4"
+        d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M11.69 28.18c-.44-1.32-.69-2.73-.69-4.18s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
+      />
+      <path
+        fill="#EA4335"
+        d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
+      />
+    </svg>
   );
 }
 
+const BADGES = [
+  { icon: Check, label: "Low MOQ" },
+  { icon: Zap, label: "Fast Delivery" },
+  { icon: Star, label: "Premium Quality" },
+];
+
 export default function HomeHero() {
   return (
-    <section className="relative flex min-h-[calc(100svh-5rem)] flex-col overflow-hidden">
-      {/* soft kraft light pooling in from the right — sets the material mood */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-[-20%] -right-[10%] h-[70vh] w-[70vh] rounded-full opacity-70 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle at center, rgba(200,169,126,0.55), transparent 62%)",
-        }}
-      />
-
-      {/* ── hero body — asymmetric 12-col ── */}
-      <div className="relative z-10 mx-auto grid w-full max-w-[1440px] flex-1 grid-cols-12 content-center items-end gap-y-10 px-6 pt-10 pb-10 md:px-12 md:pt-14">
-        {/* eyebrow, headline, lede, CTAs */}
-        <div className="col-span-12 lg:col-span-8">
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="eyebrow mb-6"
-          >
-            Est. UK · Factory-direct · No middlemen
-          </motion.p>
-
+    <section className="relative overflow-hidden">
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-12 px-6 py-14 md:px-12 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:py-20">
+        {/* left — copy */}
+        <div>
           <motion.h1
             variants={lines}
             initial="hidden"
             animate="show"
-            className="display text-mega text-ink font-semibold"
+            className="display text-mega text-ink font-extrabold"
           >
             <span className="block overflow-hidden">
               <motion.span variants={line} className="block">
@@ -70,111 +71,115 @@ export default function HomeHero() {
             </span>
             <span className="block overflow-hidden">
               <motion.span variants={line} className="block">
-                in every
-              </motion.span>
-            </span>
-            <span className="block overflow-hidden">
-              <motion.span
-                variants={line}
-                className="text-clay block italic"
-                style={{ fontStyle: "italic" }}
-              >
+                in{" "}
+                <span className="text-green-deep relative inline-block">
+                  every
+                  <span className="bg-green absolute inset-x-0 -bottom-1 h-[0.14em] rounded-full" />
+                </span>{" "}
                 cup.
               </motion.span>
             </span>
           </motion.h1>
 
+          <motion.p
+            variants={fade}
+            initial="hidden"
+            animate="show"
+            custom={0}
+            className="text-ink-soft mt-7 max-w-xl text-lg leading-relaxed"
+          >
+            Custom paper cups — direct from the manufacturer. No middlemen. Just
+            high-quality cups, low minimum orders, and fast delivery.
+          </motion.p>
+
+          {/* google trust */}
           <motion.div
             variants={fade}
             initial="hidden"
             animate="show"
-            className="mt-9 max-w-md"
+            custom={0.1}
+            className="mt-7 flex items-center gap-3"
           >
-            <p className="text-ink-soft text-lg leading-relaxed text-pretty">
-              Full-colour cups printed to order in our UK factory. No towering
-              minimums, no setup drama — just your brand, kiln-warm and boxed in
-              2–3 days.
-            </p>
+            <GoogleG className="h-6 w-6" />
+            <span className="flex text-[#F5A623]" aria-label="Rated 5 out of 5">
+              {"★★★★★"}
+            </span>
+            <span className="text-ink text-sm font-semibold">
+              Trusted by 700+ customers
+            </span>
+          </motion.div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link
-                href="/design"
-                className="group bg-clay text-paper hover:bg-clay-deep inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-medium shadow-[0_14px_30px_-14px_rgba(168,53,24,0.9)] transition-all duration-300 hover:-translate-y-0.5"
-              >
-                Design your cup
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
+          {/* CTAs */}
+          <motion.div
+            variants={fade}
+            initial="hidden"
+            animate="show"
+            custom={0.2}
+            className="mt-9 flex flex-wrap items-center gap-4"
+          >
+            <Magnetic strength={0.3}>
               <Link
                 href="/shop"
-                className="border-ink/40 text-ink hover:border-clay hover:text-clay border-b pb-1 text-base font-medium transition-colors"
+                className="group bg-green text-ink hover:bg-green-soft inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold shadow-[0_16px_34px_-16px_rgba(57,255,20,0.85)] transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                Explore the sizes
+                <ArrowRight
+                  size={18}
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
+                />
+                Shop Cups
               </Link>
-            </div>
+            </Magnetic>
+            <Link
+              href="/design"
+              className="border-ink/25 text-ink hover:border-green-deep hover:text-green-deep border-b-2 pb-1 text-base font-semibold transition-colors duration-200 ease-out"
+            >
+              Design your cup
+            </Link>
           </motion.div>
+
+          {/* feature badges */}
+          <motion.ul
+            variants={fade}
+            initial="hidden"
+            animate="show"
+            custom={0.3}
+            className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3"
+          >
+            {BADGES.map((b) => (
+              <li key={b.label} className="flex items-center gap-2">
+                <span className="bg-green/15 text-green-deep grid h-6 w-6 place-items-center rounded-full">
+                  <b.icon size={13} strokeWidth={2.5} />
+                </span>
+                <span className="text-ink text-sm font-semibold">
+                  {b.label}
+                </span>
+              </li>
+            ))}
+          </motion.ul>
         </div>
 
-        {/* right rail — social proof, deliberately off the centre axis */}
-        <motion.aside
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.85, ease: ease.out }}
-          className="col-span-12 lg:col-span-4 lg:pb-4 lg:text-right"
+        {/* right — product montage */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, ease: ease.out, delay: 0.25 }}
+          className="relative"
         >
-          <div className="lg:ml-auto lg:max-w-[16rem]">
-            <Stars />
-            <p className="text-ink-soft mt-3 text-sm leading-relaxed">
-              Trusted by{" "}
-              <span className="text-ink font-semibold">700+ UK brands</span> —
-              cafés, roasters, events and studios who wanted their name on the
-              cup, not someone else&apos;s.
-            </p>
-          </div>
-        </motion.aside>
-
-        {/* editorial ledger row — three specs, not three cards */}
-        <motion.dl
-          variants={fade}
-          initial="hidden"
-          animate="show"
-          className="border-ink/12 bg-ink/[0.06] col-span-12 mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border sm:grid-cols-3"
-        >
-          {[
-            { n: "700+", l: "Brands on the shelf" },
-            { n: "2–3 days", l: "Printed to your door" },
-            { n: "MOQ 1", l: "No minimum order" },
-          ].map((s) => (
-            <div key={s.l} className="bg-paper px-6 py-5">
-              <dt className="display text-ink text-3xl font-semibold md:text-4xl">
-                {s.n}
-              </dt>
-              <dd className="eyebrow text-ink-soft mt-2">{s.l}</dd>
-            </div>
-          ))}
-        </motion.dl>
-      </div>
-
-      {/* ── full-bleed marquee band ── */}
-      <div className="border-clay-deep/40 bg-clay text-paper relative z-10 border-y">
-        <Marquee duration={30} className="py-3">
-          {[
-            "YOUR BRAND",
-            "IN EVERY CUP",
-            "FACTORY DIRECT",
-            "LOW MINIMUMS",
-            "PRINTED IN THE UK",
-          ].map((t) => (
-            <span
-              key={t}
-              className="flex items-center gap-8 pr-8 text-sm font-medium tracking-[0.18em]"
-            >
-              {t}
-              <span className="text-paper/60">✳</span>
-            </span>
-          ))}
-        </Marquee>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 mx-auto h-4/5 w-4/5 translate-y-6 rounded-full opacity-60 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle at center, rgba(57,255,20,0.22), transparent 65%)",
+            }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero/cups-montage.png"
+            alt="A lineup of custom-branded Era Pack paper cups"
+            className="w-full object-contain drop-shadow-[0_30px_50px_rgba(15,18,17,0.12)]"
+          />
+        </motion.div>
       </div>
     </section>
   );

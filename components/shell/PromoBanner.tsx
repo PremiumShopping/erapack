@@ -17,13 +17,13 @@ export default function PromoBanner() {
   if (persisted || justDismissed) return null;
 
   return (
-    <div className="bg-ink text-paper relative z-40">
+    <div className="bg-green text-ink relative z-40">
       <div className="mx-auto flex max-w-[1440px] items-center justify-center px-10 py-2">
-        <p className="eyebrow !text-paper/90 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <p className="eyebrow !text-ink flex flex-wrap items-center justify-center gap-x-3 gap-y-1 !font-bold">
           <span>Free UK shipping over £100</span>
-          <span className="text-clay-glow hidden sm:inline">✳</span>
+          <span className="text-ink/40 hidden sm:inline">✳</span>
           <span className="hidden sm:inline">Low / no minimum order</span>
-          <span className="text-clay-glow hidden md:inline">✳</span>
+          <span className="text-ink/40 hidden md:inline">✳</span>
           <span className="hidden md:inline">2–3 day turnaround</span>
         </p>
         <button
@@ -37,7 +37,7 @@ export default function PromoBanner() {
             setJustDismissed(true);
           }}
           aria-label="Dismiss announcement"
-          className="text-paper/70 hover:bg-paper/10 hover:text-paper absolute right-3 grid h-7 w-7 place-items-center rounded-full transition-colors duration-200 ease-out"
+          className="text-ink/60 hover:bg-ink/10 hover:text-ink absolute right-3 grid h-7 w-7 place-items-center rounded-full transition-colors duration-200 ease-out"
         >
           <X size={14} strokeWidth={2} />
         </button>

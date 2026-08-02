@@ -51,7 +51,7 @@ export default function NewsletterForm() {
         <button
           type="submit"
           aria-label="Subscribe"
-          className="bg-clay text-paper hover:bg-clay-glow grid h-10 w-10 shrink-0 place-items-center rounded-full transition-transform duration-200 ease-out active:scale-[0.95]"
+          className="bg-green text-ink hover:bg-green-soft grid h-10 w-10 shrink-0 place-items-center rounded-full transition-transform duration-200 ease-out active:scale-[0.95]"
         >
           <ArrowRight size={18} />
         </button>

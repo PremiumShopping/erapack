@@ -5,32 +5,36 @@
  *  Mirror of lib/design-tokens.ts. Generates font-*, text-*, bg-* etc.
  * ================================================================== */
 @theme {
-  /* — surfaces & ink — */
-  --color-paper: #f6f1e7;
-  --color-paper-2: #efe7d6;
-  --color-paper-3: #e7dcc6;
-  --color-kraft: #c8a97e;
-  --color-kraft-deep: #9c7b4e;
-  --color-ink: #2b2320;
-  --color-ink-soft: #6b5d50;
-  --color-charcoal: #17120f;
-  --color-charcoal-2: #221b16;
+  /* — surfaces & ink — inherited from erapack.uk: white base, near-black ink — */
+  --color-paper: #ffffff; /* white base */
+  --color-paper-2: #f4f6f2; /* soft off-white section band */
+  --color-paper-3: #e9ede7; /* pressed paper / hairline fills */
+  --color-kraft: #cdeec6; /* pale-green tint (soft accent surface) */
+  --color-kraft-deep: #7ad86a; /* mid green */
+  --color-ink: #0f1211; /* near-black text */
+  --color-ink-soft: #57605a; /* muted grey text */
+  --color-charcoal: #0d0f0d; /* the single dark register (video / footer) */
+  --color-charcoal-2: #171a16;
 
-  /* — THE accent — terracotta / kiln — */
-  --color-clay: #d24b27;
-  --color-clay-deep: #a83518;
-  --color-clay-glow: #e9714e;
+  /* — THE accent — electric green (inherited from erapack.uk) —
+     `clay` is kept as an alias of green so existing utilities re-skin. */
+  --color-green: #39ff14; /* button / highlight green */
+  --color-green-deep: #1fbf07; /* darker green — hover / contrast */
+  --color-green-soft: #67ff47; /* lighter green */
+  --color-clay: #39ff14;
+  --color-clay-deep: #1fbf07;
+  --color-clay-glow: #67ff47;
 
-  /* — type — */
-  --font-display: var(--ff-display), Georgia, "Times New Roman", serif;
-  --font-sans: var(--ff-sans), ui-sans-serif, system-ui, sans-serif;
+  /* — type — Assistant, matching the live site — */
+  --font-display: var(--ff-brand), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--ff-brand), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--ff-mono), ui-monospace, "SF Mono", monospace;
 
-  /* — editorial display scale (clamped, fluid) — */
-  --text-mega: clamp(3.5rem, 11vw, 11rem);
-  --text-mega--line-height: 0.9;
-  --text-huge: clamp(2.5rem, 6.5vw, 6rem);
-  --text-huge--line-height: 0.95;
+  /* — display scale (bold-sans, clamped, fluid) — */
+  --text-mega: clamp(3rem, 8vw, 7.5rem);
+  --text-mega--line-height: 0.95;
+  --text-huge: clamp(2.25rem, 5.5vw, 4.75rem);
+  --text-huge--line-height: 1;
   --text-display: clamp(2rem, 4.5vw, 3.75rem);
   --text-display--line-height: 1.02;
 
@@ -46,7 +50,7 @@
  * ================================================================== */
 :root {
   color-scheme: light;
-  --grain-opacity: 0.055;
+  --grain-opacity: 0.03;
 }
 
 * {
@@ -81,8 +85,8 @@ html.lenis body {
 }
 
 ::selection {
-  background-color: var(--color-clay);
-  color: var(--color-paper);
+  background-color: var(--color-green);
+  color: var(--color-ink);
 }
 
 /* Warm, unobtrusive scrollbar */
@@ -106,15 +110,16 @@ html.lenis body {
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.22em;
+    font-weight: 700;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--color-clay-deep);
+    color: var(--color-ink-soft);
   }
 
   .display {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
-    font-optical-sizing: auto;
+    font-weight: 800;
+    letter-spacing: -0.03em;
   }
 
   .text-balance {
