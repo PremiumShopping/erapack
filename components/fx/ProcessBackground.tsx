@@ -1,93 +1,85 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import {
-  usePrefersReducedMotion,
-  useFinePointer,
-  useHydrated,
-} from "@/lib/useMediaQuery";
+import { usePrefersReducedMotion, useHydrated } from "@/lib/useMediaQuery";
 
 /**
  * Full-page, fixed background film of the end-to-end Era Pack process,
  * sequenced across whole-page scroll:
- *   design → print → deliver → fill  (design + fill reuse the one cup film).
+ *   cup (design→fill) → print → deliver → cup (fill)
  *
- * Each beat owns a slice of scroll; beats cross-fade into one another and,
- * on desktop, the active beat's clip is scrubbed by its local scroll progress
- * (an rAF lerp smooths coarse seeks). Touch devices get calm muted autoplay
- * loops (per-frame seeking is janky on mobile); reduced motion gets a static
- * poster. A soft white scrim keeps overlaid content legible.
+ * The active beat is played and the beats cross-fade as you scroll, so the
+ * journey steps with the page. Playback does NOT rely on the browser's
+ * autoplay policy: we try native play(), and if it's blocked we advance
+ * currentTime ourselves each frame — so the background is always visibly
+ * moving (Safari, low-power mode, etc. included). Reduced motion → static
+ * poster. A light white scrim keeps overlaid text legible.
  */
-type Beat = { src: string; t0: number; t1: number };
-
-const BEATS: Beat[] = [
-  { src: "/hero/process.mp4", t0: 0.0, t1: 0.4 }, // design (green glow, empty cup)
-  { src: "/hero/print.mp4", t0: 0.0, t1: 1.0 }, // print the green band
-  { src: "/hero/deliver.mp4", t0: 0.0, t1: 1.0 }, // deliver
-  { src: "/hero/process.mp4", t0: 0.42, t1: 1.0 }, // fill with espresso
+const SEQUENCE = [
+  "/hero/process.mp4", // design + fill (the branded cup)
+  "/hero/print.mp4", // print the green band
+  "/hero/deliver.mp4", // deliver
+  "/hero/process.mp4", // fill (the branded cup again)
 ];
 
 export default function ProcessBackground({
   poster,
-  scrim = 0.28,
+  scrim = 0.14,
 }: {
   poster: string;
   scrim?: number;
 }) {
   const hydrated = useHydrated();
   const reduced = usePrefersReducedMotion();
-  const fine = useFinePointer();
-
-  const srcs = useMemo(() => Array.from(new Set(BEATS.map((b) => b.src))), []);
-  const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
-
-  const scrub = hydrated && !reduced && fine;
-  const loop = hydrated && !reduced && !fine;
+  const srcs = useMemo(() => Array.from(new Set(SEQUENCE)), []);
+  const refs = useRef<Record<string, HTMLVideoElement | null>>({});
 
   useEffect(() => {
     if (!hydrated || reduced) return;
-    const N = BEATS.length;
-    const shown: Record<string, number> = {};
-    let raf = 0;
+    const N = SEQUENCE.length;
+    const seg = 1 / N;
+    const fade = seg * 0.6;
 
-    const tick = () => {
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - window.innerHeight || 1;
+    let raf = 0;
+    let last = 0;
+    const tick = (now: number) => {
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+
+      const max = document.documentElement.scrollHeight - window.innerHeight || 1;
       const p = Math.min(1, Math.max(0, window.scrollY / max));
 
-      // for each source, adopt the values of its highest-opacity beat
-      const chosen: Record<string, { op: number; t: number }> = {};
-      BEATS.forEach((b, i) => {
-        const center = (i + 0.5) / N;
-        const op = Math.max(0, 1 - Math.abs(p - center) / (0.72 / N));
-        const localT = Math.min(1, Math.max(0, (p - i / N) * N));
-        const v = videoRefs.current[b.src];
-        const dur = v?.duration || 0;
-        const t = (b.t0 + (b.t1 - b.t0) * localT) * dur;
-        const cur = chosen[b.src];
-        if (!cur || op > cur.op) chosen[b.src] = { op, t };
+      const op: Record<string, number> = {};
+      SEQUENCE.forEach((src, i) => {
+        const lo = i * seg;
+        const hi = (i + 1) * seg;
+        const d = p < lo ? lo - p : p > hi ? p - hi : 0;
+        const o = Math.max(0, Math.min(1, 1 - d / fade));
+        op[src] = Math.max(op[src] ?? 0, o);
       });
 
       srcs.forEach((s) => {
-        const v = videoRefs.current[s];
+        const v = refs.current[s];
         if (!v) return;
-        const c = chosen[s] || { op: 0, t: 0 };
-        v.style.opacity = String(c.op);
-        if (scrub) {
-          const prev = shown[s] ?? c.t;
-          const next = prev + (c.t - prev) * 0.15;
-          shown[s] = next;
-          if (Math.abs((v.currentTime || 0) - next) > 0.02) {
-            if (typeof v.fastSeek === "function") v.fastSeek(next);
-            else v.currentTime = next;
+        const o = op[s] ?? 0;
+        v.style.opacity = String(o);
+        if (o > 0.02) {
+          // active beat: keep it moving, autoplay-policy independent
+          if (v.paused) void v.play?.().catch(() => {});
+          if (v.paused && v.duration) {
+            let nt = v.currentTime + dt;
+            if (nt >= v.duration - 0.05) nt = 0;
+            v.currentTime = nt;
           }
+        } else if (!v.paused) {
+          v.pause();
         }
       });
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [hydrated, reduced, scrub, srcs]);
+  }, [hydrated, reduced, srcs]);
 
   return (
     <div
@@ -102,14 +94,14 @@ export default function ProcessBackground({
           <video
             key={s}
             ref={(el) => {
-              videoRefs.current[s] = el;
+              refs.current[s] = el;
             }}
             src={s}
-            poster={idx === 0 ? poster : undefined}
+            poster={poster}
             muted
+            autoPlay
+            loop
             playsInline
-            loop={loop}
-            autoPlay={loop}
             preload={idx === 0 ? "auto" : "metadata"}
             className="absolute inset-0 h-full w-full object-cover"
             style={{ opacity: idx === 0 ? 1 : 0 }}

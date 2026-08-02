@@ -9,10 +9,10 @@ const STATS: { value: React.ReactNode; label: string }[] = [
 
 export default function StatsBand() {
   return (
-    <section className="border-ink/10 bg-paper/70 border-y backdrop-blur-xl">
+    <section className="border-ink/10 bg-paper/60 border-y backdrop-blur-lg">
       <div className="bg-ink/10 mx-auto grid max-w-[1440px] grid-cols-2 gap-px overflow-hidden md:grid-cols-4">
         {STATS.map((s) => (
-          <div key={s.label} className="bg-paper/55 px-6 py-12 md:px-10 md:py-16">
+          <div key={s.label} className="bg-paper/45 px-6 py-12 md:px-10 md:py-16">
             <div className="display text-ink text-5xl font-extrabold md:text-6xl">
               {s.value}
             </div>

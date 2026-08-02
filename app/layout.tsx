@@ -46,7 +46,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ProcessBackground poster="/hero/process-poster.png" scrim={0.28} />
+        <ProcessBackground poster="/hero/process-poster.png" scrim={0.14} />
         <GrainOverlay />
         <CustomCursor />
         <CartDrawer />
