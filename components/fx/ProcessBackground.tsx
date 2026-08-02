@@ -5,11 +5,16 @@ import { usePrefersReducedMotion, useHydrated } from "@/lib/useMediaQuery";
 
 /**
  * Full-page looping background film of the Era Pack process. The four scenes
- * (design → print → deliver → fill) muted-autoplay and continuously cross-fade
- * on a timer, cycling forever — it covers the entire page (object-cover) and is
- * not tied to scroll. Playback is autoplay-policy independent (native play, or
- * we advance currentTime ourselves so it still moves in Safari / low-power).
- * Reduced motion → a static poster. A light scrim keeps overlaid text legible.
+ * (design → print → deliver → fill) muted-autoplay and dissolve into one
+ * another on a timer, cycling forever — it covers the entire page
+ * (object-cover) and is not tied to scroll.
+ *
+ * Each transition is a proper eased cross-fade: the current scene stays opaque
+ * underneath while the incoming scene fades in ON TOP (explicit z-index), so
+ * every hand-off — including the wrap-around back to scene 1 — dissolves
+ * identically and smoothly. Playback is autoplay-policy independent (native
+ * play, or we advance currentTime ourselves so it still moves in Safari).
+ * Reduced motion → a static poster.
  */
 const CLIPS = [
   "/hero/design.mp4",
@@ -17,7 +22,13 @@ const CLIPS = [
   "/hero/deliver.mp4",
   "/hero/fill.mp4",
 ];
-const SEG = 5; // seconds each scene is featured before cross-fading
+const SEG = 5.5; // seconds a scene holds
+const TR = 0.36; // fraction of a segment spent dissolving to the next scene
+
+const smooth = (t: number) => {
+  const c = Math.max(0, Math.min(1, t));
+  return c * c * c * (c * (c * 6 - 15) + 10); // smootherstep
+};
 
 export default function ProcessBackground({
   poster,
@@ -33,10 +44,6 @@ export default function ProcessBackground({
   useEffect(() => {
     if (!hydrated || reduced) return;
     const N = CLIPS.length;
-    const ringDist = (a: number, b: number) => {
-      const d = Math.abs(a - b);
-      return Math.min(d, N - d);
-    };
     let raf = 0;
     let start = 0;
     let last = 0;
@@ -45,19 +52,26 @@ export default function ProcessBackground({
       if (!start) start = now;
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
       last = now;
-      const phase = ((now - start) / 1000 / SEG) % N;
+
+      const p = (now - start) / 1000 / SEG;
+      const seg = Math.floor(p);
+      const cur = ((seg % N) + N) % N;
+      const nxt = (cur + 1) % N;
+      const f = p - seg;
+      const eased = f <= 1 - TR ? 0 : smooth((f - (1 - TR)) / TR);
 
       for (let i = 0; i < N; i++) {
         const v = refs.current[i];
         if (!v) continue;
-        const op = Math.max(0, Math.min(1, (1 - ringDist(phase, i)) / 0.5));
+        const op = i === cur ? 1 : i === nxt ? eased : 0;
         v.style.opacity = String(op);
-        if (op > 0.02) {
+        v.style.zIndex = i === nxt ? "2" : i === cur ? "1" : "0";
+        if (i === cur || i === nxt) {
           if (v.paused) void v.play?.().catch(() => {});
           if (v.paused && v.duration) {
-            let nt = v.currentTime + dt;
-            if (nt >= v.duration - 0.05) nt = 0;
-            v.currentTime = nt;
+            let t = v.currentTime + dt;
+            if (t >= v.duration - 0.05) t = 0;
+            v.currentTime = t;
           }
         } else if (!v.paused) {
           v.pause();
@@ -92,7 +106,7 @@ export default function ProcessBackground({
             playsInline
             preload={i === 0 ? "auto" : "metadata"}
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ opacity: i === 0 ? 1 : 0 }}
+            style={{ opacity: i === 0 ? 1 : 0, willChange: "opacity" }}
           />
         ))
       )}
