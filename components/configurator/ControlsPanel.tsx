@@ -2,12 +2,44 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
-import { Upload, Trash2, Plus, X, ImageIcon, Repeat } from "lucide-react";
-import { useConfigurator, type CupSize } from "@/store/configurator";
+import {
+  Upload,
+  Trash2,
+  Plus,
+  X,
+  ImageIcon,
+  Repeat,
+  Square,
+  Circle,
+  Minus,
+  Triangle,
+} from "lucide-react";
+import {
+  useConfigurator,
+  type CupSize,
+  type PatternKind,
+  type ShapeKind,
+} from "@/store/configurator";
 import { PRODUCTS, QTY_TIERS, priceFor } from "@/lib/products";
 import { gbp } from "@/lib/format";
 
 const SIZES: CupSize[] = ["4oz", "6oz", "8oz", "12oz"];
+
+const PATTERNS: { kind: PatternKind; label: string }[] = [
+  { kind: "none", label: "None" },
+  { kind: "stripes", label: "Stripes" },
+  { kind: "diagonal", label: "Diagonal" },
+  { kind: "dots", label: "Dots" },
+  { kind: "grid", label: "Grid" },
+  { kind: "chevron", label: "Chevron" },
+];
+
+const SHAPE_TOOLS: { kind: ShapeKind; label: string; Icon: typeof Square }[] = [
+  { kind: "rect", label: "Rectangle", Icon: Square },
+  { kind: "circle", label: "Circle", Icon: Circle },
+  { kind: "line", label: "Line", Icon: Minus },
+  { kind: "triangle", label: "Triangle", Icon: Triangle },
+];
 
 const BASE_SWATCHES = [
   "#FFFFFF",
@@ -169,6 +201,60 @@ export default function ControlsPanel() {
             />
           </label>
         </div>
+      </Field>
+
+      {/* pattern */}
+      <Field label="Pattern">
+        <div className="grid grid-cols-3 gap-2">
+          {PATTERNS.map((p) => (
+            <button
+              key={p.kind}
+              type="button"
+              onClick={() => c.setPattern({ pattern: p.kind })}
+              className={`rounded-xl border py-2.5 text-xs font-bold transition-colors duration-150 ease-out ${
+                c.pattern === p.kind
+                  ? "border-green bg-green/15 text-ink"
+                  : "border-ink/15 text-ink-soft hover:border-ink/40"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        {c.pattern !== "none" && (
+          <div className="mt-4 space-y-3">
+            <label className="flex items-center gap-3">
+              <span className="text-ink-soft w-14 shrink-0 text-xs font-semibold">
+                Colour
+              </span>
+              <input
+                type="color"
+                value={c.patternColor}
+                onChange={(e) => c.setPattern({ patternColor: e.target.value })}
+                aria-label="Pattern colour"
+                className="border-ink/15 h-8 w-9 shrink-0 cursor-pointer rounded-lg border"
+              />
+            </label>
+            <Slider
+              label="Scale"
+              value={c.patternScale}
+              min={0.3}
+              max={2}
+              step={0.05}
+              onChange={(v) => c.setPattern({ patternScale: v })}
+            />
+            {c.pattern === "diagonal" && (
+              <Slider
+                label="Angle"
+                value={c.patternAngle}
+                min={0}
+                max={90}
+                step={1}
+                onChange={(v) => c.setPattern({ patternAngle: v })}
+              />
+            )}
+          </div>
+        )}
       </Field>
 
       {/* logo */}
@@ -369,6 +455,101 @@ export default function ControlsPanel() {
           >
             <Plus size={16} /> Add text
           </button>
+        </div>
+      </Field>
+
+      {/* shapes & elements — the layered editor */}
+      <Field label="Shapes & elements">
+        <div className="space-y-4">
+          {c.shapes.map((sh) => (
+            <div
+              key={sh.id}
+              className="border-ink/12 bg-paper-2 space-y-3 rounded-2xl border p-4"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-ink flex-1 text-sm font-bold capitalize">
+                  {sh.kind}
+                </span>
+                <input
+                  type="color"
+                  value={sh.color}
+                  onChange={(e) =>
+                    c.updateShape(sh.id, { color: e.target.value })
+                  }
+                  aria-label="Shape colour"
+                  className="border-ink/15 h-9 w-9 shrink-0 cursor-pointer rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={() => c.removeShape(sh.id)}
+                  aria-label="Remove shape"
+                  className="text-ink-soft hover:bg-ink/5 hover:text-ink grid h-9 w-9 shrink-0 place-items-center rounded-full"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <Slider
+                label="Width"
+                value={sh.w}
+                min={0.02}
+                max={1}
+                step={0.01}
+                onChange={(v) => c.updateShape(sh.id, { w: v })}
+              />
+              <Slider
+                label={sh.kind === "line" ? "Thick" : "Height"}
+                value={sh.h}
+                min={sh.kind === "line" ? 0.004 : 0.02}
+                max={sh.kind === "line" ? 0.12 : 1}
+                step={sh.kind === "line" ? 0.004 : 0.01}
+                onChange={(v) => c.updateShape(sh.id, { h: v })}
+              />
+              <Slider
+                label="Across"
+                value={sh.x}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(v) => c.updateShape(sh.id, { x: v })}
+              />
+              <Slider
+                label="Up"
+                value={sh.y}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(v) => c.updateShape(sh.id, { y: v })}
+              />
+              <Slider
+                label="Rotate"
+                value={sh.rotation}
+                min={-180}
+                max={180}
+                step={1}
+                onChange={(v) => c.updateShape(sh.id, { rotation: v })}
+              />
+              <Slider
+                label="Opacity"
+                value={sh.opacity}
+                min={0.1}
+                max={1}
+                step={0.05}
+                onChange={(v) => c.updateShape(sh.id, { opacity: v })}
+              />
+            </div>
+          ))}
+          <div className="flex flex-wrap gap-2">
+            {SHAPE_TOOLS.map(({ kind, label, Icon }) => (
+              <button
+                key={kind}
+                type="button"
+                onClick={() => c.addShape(kind)}
+                className="border-ink/20 text-ink hover:border-green-deep hover:text-green-deep inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
+              >
+                <Icon size={15} /> {label}
+              </button>
+            ))}
+          </div>
         </div>
       </Field>
 

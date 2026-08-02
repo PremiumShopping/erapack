@@ -4,13 +4,22 @@ import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type * as THREE from "three";
-import { Lock, Unlock, ShoppingBag, Check, RotateCcw } from "lucide-react";
+import {
+  Lock,
+  Unlock,
+  ShoppingBag,
+  Check,
+  RotateCcw,
+  Mail,
+  Loader2,
+} from "lucide-react";
 import ControlsPanel from "@/components/configurator/ControlsPanel";
 import { useConfigurator } from "@/store/configurator";
 import { useCart } from "@/store/cart";
 import { PRODUCTS, priceFor } from "@/lib/products";
 import { gbp } from "@/lib/format";
 import { useHydrated } from "@/lib/useMediaQuery";
+import { drawCupArtwork, ART_W, ART_H } from "@/lib/cupArtwork";
 
 const ConfiguratorCanvas = dynamic(
   () => import("@/components/three/ConfiguratorCanvas"),
@@ -32,11 +41,18 @@ export default function Configurator() {
   const addToCart = useCart((s) => s.add);
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
+  const [contactEmail, setContactEmail] = useState("");
+  const [submit, setSubmit] = useState<{
+    state: "idle" | "sending" | "sent" | "error";
+    id?: string;
+    delivered?: boolean;
+  }>({ state: "idle" });
   const hydrated = useHydrated();
 
   const product = PRODUCTS.find((p) => p.size === config.size);
   const priced = product ? priceFor(product.price1000, config.quantity) : null;
 
+  // 3D render snapshot (for the on-screen preview + cart thumbnail)
   const capture = () => {
     const gl = glRef.current;
     if (!gl) return null;
@@ -47,9 +63,96 @@ export default function Configurator() {
     }
   };
 
-  const handleLock = () => {
-    setSnapshot(capture());
+  // flat, print-ready wrap artwork (what the factory actually prints)
+  const captureWrap = async (): Promise<string | null> => {
+    const canvas = document.createElement("canvas");
+    canvas.width = ART_W;
+    canvas.height = ART_H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    let logo: HTMLImageElement | null = null;
+    if (config.logoDataUrl) {
+      logo = await new Promise<HTMLImageElement | null>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = config.logoDataUrl as string;
+      });
+    }
+    try {
+      drawCupArtwork(ctx, config, logo);
+      return canvas.toDataURL("image/png");
+    } catch {
+      return null;
+    }
+  };
+
+  const buildSpec = () => ({
+    size: config.size,
+    baseColor: config.baseColor,
+    pattern: config.pattern,
+    patternColor: config.patternColor,
+    patternScale: config.patternScale,
+    patternAngle: config.patternAngle,
+    shapes: config.shapes,
+    logoDataUrl: config.logoDataUrl,
+    logoScale: config.logoScale,
+    logoX: config.logoX,
+    logoY: config.logoY,
+    logoRotation: config.logoRotation,
+    logoTile: config.logoTile,
+    logoTileCols: config.logoTileCols,
+    logoTileRows: config.logoTileRows,
+    textLines: config.textLines,
+    quantity: config.quantity,
+    locked: true,
+  });
+
+  const buildSummary = () =>
+    [
+      `Size: ${config.size}`,
+      `Quantity: ${config.quantity.toLocaleString("en-GB")} cups`,
+      priced
+        ? `Price: ${gbp(priced.perUnit)}/unit · ${gbp(priced.total)} total (excl. VAT)`
+        : "",
+      `Cup colour: ${config.baseColor}`,
+      config.pattern !== "none"
+        ? `Pattern: ${config.pattern} (${config.patternColor})`
+        : "Pattern: none",
+      `Shapes/elements: ${config.shapes.length}`,
+      `Text lines: ${config.textLines.length}`,
+      `Logo: ${config.logoDataUrl ? "uploaded" : "none"}${config.logoTile ? " (tiled)" : ""}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+  // Lock the design and send it to Era Pack (email → factory).
+  const handleLock = async () => {
+    const snap = capture();
+    setSnapshot(snap);
     config.lock();
+    setSubmit({ state: "sending" });
+    try {
+      const wrap = await captureWrap();
+      const res = await fetch("/api/design", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          spec: buildSpec(),
+          summary: buildSummary(),
+          snapshot: wrap ?? snap ?? undefined,
+          contactEmail: contactEmail.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setSubmit(
+        res.ok
+          ? { state: "sent", id: data.id, delivered: !!data.delivered }
+          : { state: "error" },
+      );
+    } catch {
+      setSubmit({ state: "error" });
+    }
   };
 
   const handleAdd = () => {
@@ -60,21 +163,7 @@ export default function Configurator() {
       unitPrice: priced?.perUnit ?? 0,
       priceLabel: priced ? `${gbp(priced.perUnit)}/unit` : "",
       snapshot,
-      spec: {
-        size: config.size,
-        baseColor: config.baseColor,
-        logoDataUrl: config.logoDataUrl,
-        logoScale: config.logoScale,
-        logoX: config.logoX,
-        logoY: config.logoY,
-        logoRotation: config.logoRotation,
-        logoTile: config.logoTile,
-        logoTileCols: config.logoTileCols,
-        logoTileRows: config.logoTileRows,
-        textLines: config.textLines,
-        quantity: config.quantity,
-        locked: true,
-      },
+      spec: buildSpec(),
     });
     setAdded(true);
   };
@@ -121,13 +210,31 @@ export default function Configurator() {
         {/* order bar */}
         <div className="border-ink/12 bg-paper-2 mt-10 rounded-3xl border p-6">
           {!config.locked ? (
-            <button
-              type="button"
-              onClick={handleLock}
-              className="bg-ink text-paper inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-bold transition-transform duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.98]"
-            >
-              <Lock size={18} /> Lock this design
-            </button>
+            <div className="space-y-3">
+              <label className="block">
+                <span className="text-ink-soft mb-1.5 block text-xs font-semibold">
+                  Your email — so we can confirm your print (optional)
+                </span>
+                <input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="you@business.com"
+                  className="border-ink/15 bg-paper text-ink focus:border-green w-full rounded-xl border px-4 py-3 text-sm focus:outline-none"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={handleLock}
+                className="bg-ink text-paper inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-bold transition-transform duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                <Lock size={18} /> Lock &amp; send to Era Pack
+              </button>
+              <p className="text-ink-soft/80 text-center text-xs">
+                Locking sends your print-ready design straight to our team for
+                the factory.
+              </p>
+            </div>
           ) : added ? (
             <div className="text-center">
               <span className="bg-green mx-auto grid h-12 w-12 place-items-center rounded-full">
@@ -155,6 +262,42 @@ export default function Configurator() {
             </div>
           ) : (
             <div className="space-y-5">
+              {submit.state !== "idle" && (
+                <div
+                  className={`flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm ${
+                    submit.state === "error"
+                      ? "border-red-300 bg-red-50 text-red-700"
+                      : "border-green/40 bg-green/10 text-ink"
+                  }`}
+                >
+                  {submit.state === "sending" && (
+                    <>
+                      <Loader2 size={16} className="mt-0.5 animate-spin shrink-0" />
+                      <span>Sending your design to Era Pack…</span>
+                    </>
+                  )}
+                  {submit.state === "sent" && (
+                    <>
+                      <Mail size={16} className="text-green-deep mt-0.5 shrink-0" />
+                      <span>
+                        Your design is with Era Pack
+                        {submit.id ? ` — ref ${submit.id}` : ""}. We&apos;ll
+                        prep it for the factory.
+                      </span>
+                    </>
+                  )}
+                  {submit.state === "error" && (
+                    <>
+                      <Mail size={16} className="mt-0.5 shrink-0" />
+                      <span>
+                        Couldn&apos;t reach our team just now — your design is
+                        locked; add it to cart and it&apos;ll come through with
+                        your order.
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
               {snapshot && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -176,6 +319,14 @@ export default function Configurator() {
                     style={{ background: config.baseColor }}
                   />
                   {config.baseColor}
+                </dd>
+                <dt className="text-ink-soft">Pattern</dt>
+                <dd className="text-ink text-right font-semibold capitalize">
+                  {config.pattern === "none" ? "None" : config.pattern}
+                </dd>
+                <dt className="text-ink-soft">Shapes</dt>
+                <dd className="text-ink text-right font-semibold">
+                  {config.shapes.length}
                 </dd>
                 <dt className="text-ink-soft">Logo</dt>
                 <dd className="text-ink text-right font-semibold">
@@ -238,6 +389,8 @@ export default function Configurator() {
               config.reset();
               setSnapshot(null);
               setAdded(false);
+              setSubmit({ state: "idle" });
+              setContactEmail("");
             }}
             className="text-ink-soft hover:text-ink mt-4 inline-flex items-center gap-1.5 text-xs font-semibold"
           >

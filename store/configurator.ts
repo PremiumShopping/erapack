@@ -15,9 +15,37 @@ export type TextLine = {
   rotation: number; // degrees
 };
 
+/** Repeating background pattern printed over the base colour. */
+export type PatternKind =
+  | "none"
+  | "stripes"
+  | "diagonal"
+  | "dots"
+  | "grid"
+  | "chevron";
+
+/** A free-placed design element (a layer above the base + pattern). */
+export type ShapeKind = "rect" | "circle" | "line" | "triangle";
+export type Shape = {
+  id: string;
+  kind: ShapeKind;
+  color: string;
+  x: number; // 0..1 centre across the wrap
+  y: number; // 0..1 centre vertically
+  w: number; // 0..1 width relative to the wrap
+  h: number; // 0..1 height relative to the wrap
+  rotation: number; // degrees
+  opacity: number; // 0..1
+};
+
 export type CupConfig = {
   size: CupSize;
   baseColor: string; // cup body colour
+  pattern: PatternKind;
+  patternColor: string;
+  patternScale: number; // 0.3..2 — pattern feature size
+  patternAngle: number; // degrees — for diagonal stripes
+  shapes: Shape[];
   logoDataUrl: string | null;
   logoScale: number; // 0.2..1.4
   logoX: number; // 0..1 around the wrap
@@ -50,6 +78,17 @@ type ConfigStore = CupConfig & {
     >,
   ) => void;
   setQuantity: (q: number) => void;
+  setPattern: (
+    t: Partial<
+      Pick<
+        CupConfig,
+        "pattern" | "patternColor" | "patternScale" | "patternAngle"
+      >
+    >,
+  ) => void;
+  addShape: (kind: ShapeKind) => void;
+  updateShape: (id: string, patch: Partial<Shape>) => void;
+  removeShape: (id: string) => void;
   addTextLine: () => void;
   updateTextLine: (id: string, patch: Partial<TextLine>) => void;
   removeTextLine: (id: string) => void;
@@ -67,6 +106,11 @@ const uid = () =>
 const DEFAULT: CupConfig = {
   size: "8oz",
   baseColor: "#FFFFFF",
+  pattern: "none",
+  patternColor: "#39FF14",
+  patternScale: 1,
+  patternAngle: 45,
+  shapes: [],
   logoDataUrl: null,
   logoScale: 0.6,
   logoX: 0.5,
@@ -89,6 +133,32 @@ export const useConfigurator = create<ConfigStore>()(
       setLogo: (logoDataUrl) => set({ logoDataUrl }),
       setLogoTransform: (t) => set((s) => ({ ...s, ...t })),
       setQuantity: (quantity) => set({ quantity }),
+      setPattern: (t) => set((s) => ({ ...s, ...t })),
+      addShape: (kind) =>
+        set((s) => ({
+          shapes: [
+            ...s.shapes,
+            {
+              id: uid(),
+              kind,
+              color: kind === "line" ? "#0F1211" : "#39FF14",
+              x: 0.5,
+              y: 0.5,
+              w: kind === "line" ? 0.5 : 0.22,
+              h: kind === "line" ? 0.02 : 0.22,
+              rotation: 0,
+              opacity: 1,
+            },
+          ],
+        })),
+      updateShape: (id, patch) =>
+        set((s) => ({
+          shapes: s.shapes.map((sh) =>
+            sh.id === id ? { ...sh, ...patch } : sh,
+          ),
+        })),
+      removeShape: (id) =>
+        set((s) => ({ shapes: s.shapes.filter((sh) => sh.id !== id) })),
       addTextLine: () =>
         set((s) => ({
           textLines: [
@@ -117,6 +187,6 @@ export const useConfigurator = create<ConfigStore>()(
       unlock: () => set({ locked: false }),
       reset: () => set({ ...DEFAULT }),
     }),
-    { name: "erapack:design-v3" },
+    { name: "erapack:design-v4" },
   ),
 );

@@ -34,6 +34,10 @@ export function drawCupArtwork(
   }
   ctx.restore();
 
+  // repeating pattern, then free-placed shapes (layers under the brand marks)
+  drawPattern(ctx, config, w, h);
+  drawShapes(ctx, config, w, h);
+
   // logo — a single placement, or tiled across the whole wrap
   if (logo && logo.width > 0) {
     const aspect = logo.height / logo.width;
@@ -78,6 +82,108 @@ export function drawCupArtwork(
     ctx.font = `800 ${fs}px Assistant, ui-sans-serif, sans-serif`;
     ctx.fillStyle = line.color;
     ctx.fillText(line.text, 0, 0);
+    ctx.restore();
+  }
+}
+
+/** Draw the repeating background pattern over the base colour. */
+function drawPattern(
+  ctx: CanvasRenderingContext2D,
+  config: CupConfig,
+  w: number,
+  h: number,
+) {
+  const kind = config.pattern;
+  if (!kind || kind === "none") return;
+  const period = Math.max(14, 64 * config.patternScale);
+  ctx.save();
+  ctx.fillStyle = config.patternColor;
+  ctx.strokeStyle = config.patternColor;
+
+  if (kind === "stripes") {
+    for (let x = 0; x < w; x += period * 2) ctx.fillRect(x, 0, period, h);
+  } else if (kind === "diagonal") {
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate((config.patternAngle * Math.PI) / 180);
+    for (let x = -w * 1.5; x < w * 1.5; x += period * 2) {
+      ctx.fillRect(x, -h * 1.5, period, h * 3);
+    }
+  } else if (kind === "dots") {
+    const gap = period * 1.5;
+    const r = period * 0.28;
+    for (let y = gap * 0.5; y < h + gap; y += gap) {
+      for (let x = gap * 0.5; x < w + gap; x += gap) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (kind === "grid") {
+    ctx.lineWidth = Math.max(1.5, period * 0.08);
+    for (let x = 0; x <= w; x += period) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= h; y += period) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+  } else if (kind === "chevron") {
+    ctx.lineWidth = Math.max(3, period * 0.2);
+    ctx.lineJoin = "round";
+    for (let y = 0; y < h + period; y += period) {
+      ctx.beginPath();
+      for (let x = -period; x < w + period; x += period) {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + period / 2, y + period / 2);
+        ctx.lineTo(x + period, y);
+      }
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+/** Draw the free-placed shape layers. */
+function drawShapes(
+  ctx: CanvasRenderingContext2D,
+  config: CupConfig,
+  w: number,
+  h: number,
+) {
+  for (const s of config.shapes) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, s.opacity));
+    ctx.fillStyle = s.color;
+    ctx.strokeStyle = s.color;
+    ctx.translate(s.x * w, (1 - s.y) * h);
+    ctx.rotate((s.rotation * Math.PI) / 180);
+    const bw = s.w * w;
+    const bh = s.h * h;
+    if (s.kind === "rect") {
+      ctx.fillRect(-bw / 2, -bh / 2, bw, bh);
+    } else if (s.kind === "circle") {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, bw / 2, bh / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (s.kind === "line") {
+      ctx.lineWidth = Math.max(2, bh);
+      ctx.beginPath();
+      ctx.moveTo(-bw / 2, 0);
+      ctx.lineTo(bw / 2, 0);
+      ctx.stroke();
+    } else if (s.kind === "triangle") {
+      ctx.beginPath();
+      ctx.moveTo(0, -bh / 2);
+      ctx.lineTo(bw / 2, bh / 2);
+      ctx.lineTo(-bw / 2, bh / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
     ctx.restore();
   }
 }
