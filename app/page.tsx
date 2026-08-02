@@ -9,11 +9,12 @@ export default function Home() {
   return (
     <main>
       <HomeHero />
+      {/* Scroll-scrubbed espresso-fill video (Higgsfield-generated) — the
+          first scroll moment, right after the hero. */}
+      <ScrollVideoHero />
       <StatsBand />
       <WhyEraPack />
       <OurCups />
-      {/* Scroll-scrubbed espresso-fill video (Higgsfield-generated). */}
-      <ScrollVideoHero />
       <ClosingCTA />
     </main>
   );
