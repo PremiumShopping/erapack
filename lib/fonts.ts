@@ -1,15 +1,38 @@
 /**
- * Type system — inherited from the real erapack.uk, which uses **Assistant**
- * (Google Fonts) for both headings and body. Self-hosted via next/font.
- * Space Mono is kept only for small technical/spec labels (craft accents).
+ * Type system. Assistant (from the live erapack.uk) stays the body/UI
+ * workhorse. A UK print-shop voice is layered on top:
+ *   - Bricolage Grotesque — the display face (headlines), real weight/width.
+ *   - Fraunces — an editorial serif used sparingly, in italic, for emphasis.
+ *   - Space Mono — SKU / spec / ledger rows only.
+ * All self-hosted via next/font.
  */
-import { Assistant, Space_Mono } from "next/font/google";
+import {
+  Assistant,
+  Space_Mono,
+  Bricolage_Grotesque,
+  Fraunces,
+} from "next/font/google";
 
-// Single brand face for display + body (matches the live site).
+// Body + UI workhorse (matches the live site).
 export const brandFont = Assistant({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--ff-brand",
+  display: "swap",
+});
+
+// Display face for headlines (variable).
+export const displayFont = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--ff-bricolage",
+  display: "swap",
+});
+
+// Editorial serif for the occasional italic emphasis (variable).
+export const editorialFont = Fraunces({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--ff-fraunces",
   display: "swap",
 });
 
@@ -21,4 +44,4 @@ export const monoFont = Space_Mono({
 });
 
 /** All font CSS-variable classes for the <html> element. */
-export const fontVariables = `${brandFont.variable} ${monoFont.variable}`;
+export const fontVariables = `${brandFont.variable} ${displayFont.variable} ${editorialFont.variable} ${monoFont.variable}`;

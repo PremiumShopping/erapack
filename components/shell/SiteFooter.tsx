@@ -45,9 +45,7 @@ export default function SiteFooter() {
         {/* newsletter + sustainability */}
         <div className="border-paper/12 grid grid-cols-1 gap-14 border-b pb-16 lg:grid-cols-2">
           <div>
-            <p className="eyebrow" style={{ color: "var(--color-clay-glow)" }}>
-              Keep in the loop
-            </p>
+            <p className="eyebrow text-paper/60">Keep in the loop</p>
             <h2 className="display mt-4 max-w-md text-4xl leading-[1.05] font-semibold md:text-5xl">
               Good cups, <span className="text-green">now and then.</span>
             </h2>
@@ -58,11 +56,11 @@ export default function SiteFooter() {
 
           <div className="flex flex-col justify-end gap-5 lg:items-end lg:text-right">
             <div className="text-paper/80 flex items-center gap-3">
-              <Recycle size={20} className="text-clay-glow" />
+              <Recycle size={20} className="text-paper/70" />
               <span className="text-lg">100% recyclable stock</span>
             </div>
             <div className="text-paper/80 flex items-center gap-3">
-              <Wind size={20} className="text-clay-glow" />
+              <Wind size={20} className="text-paper/70" />
               <span className="text-lg">Printed on renewable energy</span>
             </div>
             <p className="text-paper/50 max-w-sm text-sm leading-relaxed">
@@ -122,18 +120,18 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      {/* oversized signature wordmark */}
-      <div
-        aria-hidden
-        className="display text-paper/[0.05] px-6 text-[22vw] leading-[0.8] font-semibold tracking-tight whitespace-nowrap select-none md:px-12"
-      >
-        Your brand.
+      {/* oversized signature wordmark — set in the display face, green ink,
+          bled off the right edge as the site's recurring signature device */}
+      <div aria-hidden className="overflow-hidden select-none">
+        <div className="display text-green/[0.11] translate-x-[5%] pl-6 text-[23vw] leading-[0.78] font-bold tracking-tight whitespace-nowrap md:pl-12">
+          Your brand.
+        </div>
       </div>
 
       <div className="text-paper/45 mx-auto flex w-full max-w-[1440px] flex-col items-start justify-between gap-3 px-6 py-8 text-sm md:flex-row md:items-center md:px-12">
         <p>© {2026} Era Pack Ltd. Made in the UK.</p>
-        <p className="font-mono text-xs tracking-widest uppercase">
-          Your brand · in every cup
+        <p className="font-editorial text-paper/65 text-base italic">
+          Printed in Britain. Answered by a human.
         </p>
       </div>
     </footer>

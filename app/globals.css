@@ -5,10 +5,11 @@
  *  Mirror of lib/design-tokens.ts. Generates font-*, text-*, bg-* etc.
  * ================================================================== */
 @theme {
-  /* — surfaces & ink — inherited from erapack.uk: white base, near-black ink — */
+  /* — surfaces & ink — white base + near-black ink, on WARM paper stock — */
   --color-paper: #ffffff; /* white base */
-  --color-paper-2: #f4f6f2; /* soft off-white section band */
-  --color-paper-3: #e9ede7; /* pressed paper / hairline fills */
+  --color-paper-warm: #faf7f0; /* warm stock — the studio's default surface */
+  --color-paper-2: #f6f2e9; /* warm off-white section band */
+  --color-paper-3: #ece6d8; /* pressed warm paper / hairline fills */
   --color-kraft: #cdeec6; /* pale-green tint (soft accent surface) */
   --color-kraft-deep: #7ad86a; /* mid green */
   --color-ink: #0f1211; /* near-black text */
@@ -25,9 +26,10 @@
   --color-clay-deep: #1fbf07;
   --color-clay-glow: #67ff47;
 
-  /* — type — Assistant, matching the live site — */
-  --font-display: var(--ff-brand), ui-sans-serif, system-ui, sans-serif;
+  /* — type — Bricolage display + Assistant body + Fraunces editorial serif — */
+  --font-display: var(--ff-bricolage), var(--ff-brand), ui-sans-serif, sans-serif;
   --font-sans: var(--ff-brand), ui-sans-serif, system-ui, sans-serif;
+  --font-editorial: var(--ff-fraunces), Georgia, "Times New Roman", serif;
   --font-mono: var(--ff-mono), ui-monospace, "SF Mono", monospace;
 
   /* — display scale (bold-sans, clamped, fluid) — */
@@ -122,20 +124,67 @@ html.lenis body {
  *  Utility layer — the house vocabulary
  * ================================================================== */
 @layer utilities {
-  /* Mono kicker / eyebrow label used above headings and on ledger rows */
+  /* Humanist small-caps kicker (not the mono-UPPERCASE-0.2em cliché) */
   .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    font-variant: small-caps;
     color: var(--color-ink-soft);
   }
 
   .display {
     font-family: var(--font-display);
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Editorial serif — used sparingly, usually italic, for emphasis */
+  .font-editorial {
+    font-family: var(--font-editorial);
+  }
+
+  /* Structural green — a 2px keyline that organises, not a garnish */
+  .rule-green {
+    border-top: 2px solid var(--color-green);
+  }
+
+  /* Full-bleed plates — green/ink used as material, not accents */
+  .green-block {
+    background: var(--color-green);
+    color: var(--color-ink);
+  }
+  .ink-block {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  /* L-shaped registration/crop ticks in the corners of a framed block */
+  .reg-marks {
+    position: relative;
+  }
+  .reg-marks::before,
+  .reg-marks::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--color-ink);
+    pointer-events: none;
+  }
+  .reg-marks::before {
+    top: 8px;
+    left: 8px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+  .reg-marks::after {
+    bottom: 8px;
+    right: 8px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
   }
 
   .text-balance {

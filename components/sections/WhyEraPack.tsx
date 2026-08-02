@@ -8,45 +8,45 @@ const VALUES = [
   {
     icon: Boxes,
     title: "No minimum order",
-    body: "Every business deserves access to quality cups — so we set no minimum order quantity. Order a single sleeve or ten thousand.",
+    body: "Most printers want 5,000 before they'll turn the press on. We'll do one sleeve.",
   },
   {
     icon: BadgePoundSterling,
     title: "Factory-direct pricing",
-    body: "No middlemen, just factory-direct pricing. That's why we confidently offer price matching and a price guarantee.",
+    body: "We own the press, so there's no reseller margin on top. Find it cheaper and we'll match it.",
   },
   {
     icon: Truck,
     title: "Fast delivery",
-    body: "Busy days or a last-minute event? We get it. Next-day delivery is available, with your cups boxed in 2–3 working days.",
+    body: "Next-day if you're in a hurry; otherwise boxed and couriered in two to three working days.",
   },
   {
     icon: Leaf,
     title: "Genuinely eco",
-    body: "Sustainability sits at the heart of it: 100% recyclable materials, water-based inks and operations run on renewable energy.",
+    body: "Recyclable board, water-based inks, a factory on renewable power. We don't make a song and dance about it.",
   },
 ];
 
 export default function WhyEraPack() {
   return (
-    <section className="bg-paper-2/25">
+    <section className="bg-paper-warm">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-12 px-6 py-24 md:px-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         {/* left — heading (sticky on desktop) */}
         <div className="lg:sticky lg:top-28 lg:h-fit">
-          <p className="eyebrow">Why EraPack</p>
-          <h2 className="display text-huge text-ink mt-5">
+          <p className="eyebrow">The honest pitch</p>
+          <h2 className="display text-huge text-ink mt-5 font-bold">
             Big-brand cups,
             <br />
             <span className="text-green-deep">without the minimums.</span>
           </h2>
           <p className="text-ink-soft mt-6 max-w-sm text-lg leading-relaxed">
-            A UK manufacturer specialising in fast turnaround and low minimums —
-            so independents and chains alike get affordable, high-quality
-            custom-branded cups.
+            A UK manufacturer built for fast turnaround and low minimums — so
+            independents and chains alike get affordable, properly-printed
+            custom cups.
           </p>
         </div>
 
-        {/* right — numbered editorial list */}
+        {/* right — editorial list organised by green keylines */}
         <ol>
           {VALUES.map((v, i) => (
             <motion.li
@@ -55,18 +55,15 @@ export default function WhyEraPack() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, ease: ease.out, delay: i * 0.06 }}
-              className="border-ink/12 grid grid-cols-[auto_1fr] items-start gap-x-6 gap-y-2 border-t py-8 first:border-t-0 first:pt-0"
+              className={`grid grid-cols-[auto_1fr] items-start gap-x-6 gap-y-2 py-8 ${
+                i === 0 ? "" : "rule-green"
+              }`}
             >
-              <div className="flex items-center gap-4">
-                <span className="text-green-deep font-mono text-sm">
-                  0{i + 1}
-                </span>
-                <span className="bg-green/15 text-green-deep grid h-12 w-12 place-items-center rounded-full">
-                  <v.icon size={20} strokeWidth={2.2} />
-                </span>
-              </div>
+              <span className="bg-ink text-green ring-green/50 grid h-12 w-12 place-items-center rounded-[3px] ring-1">
+                <v.icon size={20} strokeWidth={2.2} />
+              </span>
               <div>
-                <h3 className="display text-ink text-2xl font-bold md:text-3xl">
+                <h3 className="display text-ink text-2xl font-semibold md:text-3xl">
                   {v.title}
                 </h3>
                 <p className="text-ink-soft mt-2 max-w-lg leading-relaxed text-pretty">
