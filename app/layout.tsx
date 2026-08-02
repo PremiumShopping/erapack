@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { fontVariables } from "@/lib/fonts";
 import SmoothScroll from "@/components/providers/SmoothScroll";
-import ProcessBackground from "@/components/fx/ProcessBackground";
 import GrainOverlay from "@/components/fx/GrainOverlay";
 import CustomCursor from "@/components/fx/CustomCursor";
 import PromoBanner from "@/components/shell/PromoBanner";
@@ -46,7 +45,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ProcessBackground poster="/hero/process-poster.png" scrim={0.14} />
         <GrainOverlay />
         <CustomCursor />
         <CartDrawer />

@@ -80,8 +80,8 @@ export default function SiteNav() {
     <header
       className={`sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300 ease-out ${
         scrolled
-          ? "border-ink/10 bg-paper/85 border-b shadow-[0_10px_30px_-24px_rgba(43,35,32,0.9)] backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
+          ? "border-ink/10 bg-paper/90 border-b shadow-[0_10px_30px_-24px_rgba(43,35,32,0.9)] backdrop-blur-md"
+          : "border-ink/10 bg-paper/80 border-b backdrop-blur-md"
       }`}
     >
       <nav className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 md:px-12">

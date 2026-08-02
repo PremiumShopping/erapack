@@ -1,88 +1,73 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { usePrefersReducedMotion, useHydrated } from "@/lib/useMediaQuery";
 
 /**
- * The whole page background: one scroll-driven process film. Scroll position
- * IS the timeline — the top of the page is the very beginning (a blank branded
- * cup being designed) and it advances, beat by beat, to the espresso fill at
- * the bottom:
- *   design → print → deliver → fill
- *
- * Each beat owns a quarter of the scroll; the active clip is scrubbed by its
- * local scroll progress and the beats cross-fade at the seams (design + fill
- * are two ends of the one cup film). object-contain keeps the whole scene in
- * view (no giant crop). Reduced motion → static poster. Light scrim for text.
+ * Full-page looping background film of the Era Pack process. The four scenes
+ * (design → print → deliver → fill) muted-autoplay and continuously cross-fade
+ * on a timer, cycling forever — it covers the entire page (object-cover) and is
+ * not tied to scroll. Playback is autoplay-policy independent (native play, or
+ * we advance currentTime ourselves so it still moves in Safari / low-power).
+ * Reduced motion → a static poster. A light scrim keeps overlaid text legible.
  */
-type Beat = { src: string; t0: number; t1: number };
-
-const BEATS: Beat[] = [
-  { src: "/hero/design.mp4", t0: 0.0, t1: 1.0 }, // designing the cup on the website
-  { src: "/hero/print.mp4", t0: 0.0, t1: 1.0 }, // production / printing
-  { src: "/hero/deliver.mp4", t0: 0.0, t1: 1.0 }, // delivery
-  { src: "/hero/fill.mp4", t0: 0.0, t1: 1.0 }, // espresso filled into the cup
+const CLIPS = [
+  "/hero/design.mp4",
+  "/hero/print.mp4",
+  "/hero/deliver.mp4",
+  "/hero/fill.mp4",
 ];
+const SEG = 5; // seconds each scene is featured before cross-fading
 
 export default function ProcessBackground({
   poster,
-  scrim = 0.16,
+  scrim = 0.18,
 }: {
   poster: string;
   scrim?: number;
 }) {
   const hydrated = useHydrated();
   const reduced = usePrefersReducedMotion();
-  const srcs = useMemo(() => Array.from(new Set(BEATS.map((b) => b.src))), []);
-  const refs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const refs = useRef<Array<HTMLVideoElement | null>>([]);
 
   useEffect(() => {
     if (!hydrated || reduced) return;
-    const N = BEATS.length;
-    const seg = 1 / N;
-    const fade = seg * 0.5;
-    const shown: Record<string, number> = {};
+    const N = CLIPS.length;
+    const ringDist = (a: number, b: number) => {
+      const d = Math.abs(a - b);
+      return Math.min(d, N - d);
+    };
     let raf = 0;
+    let start = 0;
+    let last = 0;
 
-    const tick = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight || 1;
-      const p = Math.min(1, Math.max(0, window.scrollY / max));
+    const tick = (now: number) => {
+      if (!start) start = now;
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      last = now;
+      const phase = ((now - start) / 1000 / SEG) % N;
 
-      // for each source pick its highest-opacity beat (design + fill share one clip)
-      const chosen: Record<string, { op: number; t: number }> = {};
-      BEATS.forEach((b, i) => {
-        const lo = i * seg;
-        const hi = (i + 1) * seg;
-        const d = p < lo ? lo - p : p > hi ? p - hi : 0;
-        const op = Math.max(0, Math.min(1, 1 - d / fade));
-        const localT = Math.min(1, Math.max(0, (p - lo) / seg));
-        const v = refs.current[b.src];
-        const dur = v?.duration || 0;
-        const t = (b.t0 + (b.t1 - b.t0) * localT) * dur;
-        const cur = chosen[b.src];
-        if (!cur || op > cur.op) chosen[b.src] = { op, t };
-      });
-
-      srcs.forEach((s) => {
-        const v = refs.current[s];
-        if (!v) return;
-        const c = chosen[s] || { op: 0, t: 0 };
-        v.style.opacity = String(c.op);
-        if (!v.paused) v.pause();
-        // smooth the scrub, and set currentTime explicitly so the frame paints
-        const prev = shown[s] ?? c.t;
-        const next = prev + (c.t - prev) * 0.32;
-        shown[s] = next;
-        if (v.readyState >= 1 && Math.abs((v.currentTime || 0) - next) > 0.01) {
-          if (typeof v.fastSeek === "function") v.fastSeek(next);
-          else v.currentTime = next;
+      for (let i = 0; i < N; i++) {
+        const v = refs.current[i];
+        if (!v) continue;
+        const op = Math.max(0, Math.min(1, (1 - ringDist(phase, i)) / 0.5));
+        v.style.opacity = String(op);
+        if (op > 0.02) {
+          if (v.paused) void v.play?.().catch(() => {});
+          if (v.paused && v.duration) {
+            let nt = v.currentTime + dt;
+            if (nt >= v.duration - 0.05) nt = 0;
+            v.currentTime = nt;
+          }
+        } else if (!v.paused) {
+          v.pause();
         }
-      });
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [hydrated, reduced, srcs]);
+  }, [hydrated, reduced]);
 
   return (
     <div
@@ -91,21 +76,23 @@ export default function ProcessBackground({
     >
       {reduced ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={poster} alt="" className="h-full w-full object-contain" />
+        <img src={poster} alt="" className="h-full w-full object-cover" />
       ) : (
-        srcs.map((s, idx) => (
+        CLIPS.map((src, i) => (
           <video
-            key={s}
+            key={src}
             ref={(el) => {
-              refs.current[s] = el;
+              refs.current[i] = el;
             }}
-            src={s}
-            poster={poster}
+            src={src}
+            poster={i === 0 ? poster : undefined}
             muted
+            autoPlay
+            loop
             playsInline
-            preload={idx === 0 ? "auto" : "metadata"}
-            className="absolute inset-0 h-full w-full object-contain"
-            style={{ opacity: idx === 0 ? 1 : 0 }}
+            preload={i === 0 ? "auto" : "metadata"}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: i === 0 ? 1 : 0 }}
           />
         ))
       )}
