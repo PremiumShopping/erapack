@@ -28,6 +28,15 @@ export const useFinePointer = () => useMediaQuery("(pointer: fine)");
  * Not reactive across tabs (no subscription) — only the current value at
  * mount/hydration matters for our dismiss-once banners.
  */
+/** True only after client hydration — gate persisted-store UI to avoid flashes. */
+export function useHydrated(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
+
 export function usePersistentFlag(key: string): boolean {
   return useSyncExternalStore(
     () => () => {},

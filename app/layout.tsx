@@ -7,6 +7,7 @@ import CustomCursor from "@/components/fx/CustomCursor";
 import PromoBanner from "@/components/shell/PromoBanner";
 import SiteNav from "@/components/shell/SiteNav";
 import SiteFooter from "@/components/shell/SiteFooter";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
@@ -40,6 +41,7 @@ export default function RootLayout({
       <body className="bg-paper text-ink flex min-h-full flex-col">
         <GrainOverlay />
         <CustomCursor />
+        <CartDrawer />
         <SmoothScroll>
           <PromoBanner />
           <SiteNav />

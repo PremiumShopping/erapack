@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Leaf, Menu, ShoppingBag, X } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
+import { useUI } from "@/store/ui";
+import { useCart, cartCount } from "@/store/cart";
 
 const MAIN = [
   { href: "/shop", label: "Shop" },
@@ -24,6 +26,8 @@ const ABOUT = [
 
 export default function SiteNav() {
   const pathname = usePathname();
+  const openCart = useUI((s) => s.openCart);
+  const count = useCart((s) => cartCount(s.items));
   const [scrolled, setScrolled] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -173,15 +177,21 @@ export default function SiteNav() {
           </Link>
 
           <Magnetic strength={0.3}>
-            <Link
-              href="/cart"
+            <button
+              type="button"
+              onClick={openCart}
               data-cursor="Cart"
-              aria-label="Cart"
-              className="border-ink/20 text-ink hover:border-clay hover:text-clay flex items-center gap-2 rounded-full border px-4 py-2 text-[15px] font-medium transition-all duration-200 ease-out active:scale-[0.97]"
+              aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
+              className="border-ink/20 text-ink hover:border-green-deep hover:text-green-deep relative flex items-center gap-2 rounded-full border px-4 py-2 text-[15px] font-medium transition-all duration-200 ease-out active:scale-[0.97]"
             >
               <ShoppingBag size={16} strokeWidth={2} />
               <span className="hidden sm:inline">Cart</span>
-            </Link>
+              {count > 0 && (
+                <span className="bg-green text-ink absolute -top-1 -right-1 grid h-5 min-w-[20px] place-items-center rounded-full px-1 text-[11px] font-bold">
+                  {count}
+                </span>
+              )}
+            </button>
           </Magnetic>
 
           {/* mobile toggle */}
