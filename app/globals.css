@@ -187,6 +187,25 @@ html.lenis body {
     border-right: 2px solid;
   }
 
+  /* Infinite scrolling announcement reel (two identical rows, shift by half) */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee-track {
+    animation: marquee 34s linear infinite;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+
   .text-balance {
     text-wrap: balance;
   }

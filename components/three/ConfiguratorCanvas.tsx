@@ -60,7 +60,7 @@ function Cup({ spin }: { spin: boolean }) {
     config.logoX,
     config.logoY,
     config.logoRotation,
-    config.logoTile,
+    config.logoFit,
     config.logoTileCols,
     config.logoTileRows,
     config.textLines,

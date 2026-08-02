@@ -38,6 +38,9 @@ export type Shape = {
   opacity: number; // 0..1
 };
 
+/** How an uploaded logo is placed on the wrap (wallpaper-style). */
+export type LogoFit = "custom" | "fill" | "fit" | "stretch" | "tile";
+
 export type CupConfig = {
   size: CupSize;
   baseColor: string; // cup body colour
@@ -51,7 +54,7 @@ export type CupConfig = {
   logoX: number; // 0..1 around the wrap
   logoY: number; // 0..1 vertical
   logoRotation: number; // degrees
-  logoTile: boolean; // repeat the logo across the whole wrap
+  logoFit: LogoFit; // placement mode (custom / fill / fit / stretch / tile)
   logoTileCols: number; // horizontal repeats when tiling
   logoTileRows: number; // vertical repeats when tiling
   textLines: TextLine[];
@@ -71,7 +74,7 @@ type ConfigStore = CupConfig & {
         | "logoX"
         | "logoY"
         | "logoRotation"
-        | "logoTile"
+        | "logoFit"
         | "logoTileCols"
         | "logoTileRows"
       >
@@ -116,7 +119,7 @@ const DEFAULT: CupConfig = {
   logoX: 0.5,
   logoY: 0.5,
   logoRotation: 0,
-  logoTile: false,
+  logoFit: "custom",
   logoTileCols: 3,
   logoTileRows: 3,
   textLines: [],
@@ -187,6 +190,6 @@ export const useConfigurator = create<ConfigStore>()(
       unlock: () => set({ locked: false }),
       reset: () => set({ ...DEFAULT }),
     }),
-    { name: "erapack:design-v4" },
+    { name: "erapack:design-v5" },
   ),
 );

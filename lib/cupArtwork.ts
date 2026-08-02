@@ -50,7 +50,9 @@ export function drawCupArtwork(
       ctx.drawImage(logo, -boxW / 2, -boxH / 2, boxW, boxH);
       ctx.restore();
     };
-    if (config.logoTile) {
+    const iw = logo.width;
+    const ih = logo.height;
+    if (config.logoFit === "tile") {
       const cols = Math.max(1, Math.round(config.logoTileCols));
       const rows = Math.max(1, Math.round(config.logoTileRows));
       const cellW = w / cols;
@@ -61,7 +63,23 @@ export function drawCupArtwork(
           drawAt((c + 0.5) * cellW, (r + 0.5) * cellH, boxW);
         }
       }
+    } else if (config.logoFit === "fill") {
+      // cover the whole wrap, cropping overflow
+      const scale = Math.max(w / iw, h / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      ctx.drawImage(logo, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    } else if (config.logoFit === "fit") {
+      // contain within the wrap, no cropping
+      const scale = Math.min(w / iw, h / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      ctx.drawImage(logo, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    } else if (config.logoFit === "stretch") {
+      // fill exactly, ignoring aspect ratio
+      ctx.drawImage(logo, 0, 0, w, h);
     } else {
+      // custom — manual scale / position / rotation
       drawAt(
         config.logoX * w,
         (1 - config.logoY) * h,

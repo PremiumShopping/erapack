@@ -8,6 +8,7 @@ import { ChevronDown, Leaf, Menu, ShoppingBag, X } from "lucide-react";
 import Magnetic from "@/components/ui/Magnetic";
 import { useUI } from "@/store/ui";
 import { useCart, cartCount } from "@/store/cart";
+import { useAuth } from "@/store/auth";
 import { useHydrated } from "@/lib/useMediaQuery";
 
 const MAIN = [
@@ -31,6 +32,8 @@ export default function SiteNav() {
   const hydrated = useHydrated();
   const rawCount = useCart((s) => cartCount(s.items));
   const count = hydrated ? rawCount : 0; // avoid SSR/persist hydration mismatch
+  const user = useAuth((s) => s.user);
+  const signedIn = hydrated && !!user;
   const [scrolled, setScrolled] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -171,10 +174,10 @@ export default function SiteNav() {
         {/* right actions */}
         <div className="flex items-center gap-3 md:gap-5">
           <Link
-            href="/login"
+            href={signedIn ? "/account" : "/login"}
             className="text-ink hover:text-green-deep hidden text-[15px] font-medium transition-colors duration-200 ease-out sm:block"
           >
-            Log in
+            {signedIn ? "Account" : "Log in"}
           </Link>
 
           <Magnetic strength={0.3}>

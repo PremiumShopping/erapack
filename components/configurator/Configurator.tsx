@@ -16,6 +16,7 @@ import {
 import ControlsPanel from "@/components/configurator/ControlsPanel";
 import { useConfigurator } from "@/store/configurator";
 import { useCart } from "@/store/cart";
+import { useDesigns } from "@/store/designs";
 import { PRODUCTS, priceFor } from "@/lib/products";
 import { gbp } from "@/lib/format";
 import { useHydrated } from "@/lib/useMediaQuery";
@@ -35,12 +36,31 @@ const ConfiguratorCanvas = dynamic(
   },
 );
 
+// preview scenes — a backdrop behind the (transparent) 3D canvas so people
+// can see the cup in context.
+type SceneId = "studio" | "cafe" | "bar" | "hand";
+const SCENES: { id: SceneId; label: string; bg: string | null }[] = [
+  { id: "studio", label: "Studio", bg: null },
+  { id: "cafe", label: "Café", bg: "/scenes/cafe.png" },
+  { id: "bar", label: "Bar", bg: "/scenes/bar.png" },
+  { id: "hand", label: "In hand", bg: "/scenes/hand.png" },
+];
+
+// module-scope so the purity rule doesn't flag these (called from handlers)
+const genDesignId = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `d_${Date.now()}`;
+const nowMs = () => Date.now();
+
 export default function Configurator() {
   const glRef = useRef<THREE.WebGLRenderer | null>(null);
   const config = useConfigurator();
   const addToCart = useCart((s) => s.add);
+  const saveDesign = useDesigns((s) => s.save);
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
+  const [scene, setScene] = useState<SceneId>("studio");
   const [contactEmail, setContactEmail] = useState("");
   const [submit, setSubmit] = useState<{
     state: "idle" | "sending" | "sent" | "error";
@@ -100,7 +120,7 @@ export default function Configurator() {
     logoX: config.logoX,
     logoY: config.logoY,
     logoRotation: config.logoRotation,
-    logoTile: config.logoTile,
+    logoFit: config.logoFit,
     logoTileCols: config.logoTileCols,
     logoTileRows: config.logoTileRows,
     textLines: config.textLines,
@@ -121,7 +141,7 @@ export default function Configurator() {
         : "Pattern: none",
       `Shapes/elements: ${config.shapes.length}`,
       `Text lines: ${config.textLines.length}`,
-      `Logo: ${config.logoDataUrl ? "uploaded" : "none"}${config.logoTile ? " (tiled)" : ""}`,
+      `Logo: ${config.logoDataUrl ? `uploaded — ${config.logoFit}` : "none"}`,
     ]
       .filter(Boolean)
       .join("\n");
@@ -131,6 +151,14 @@ export default function Configurator() {
     const snap = capture();
     setSnapshot(snap);
     config.lock();
+    saveDesign({
+      id: genDesignId(),
+      name: `${config.size} cup`,
+      size: config.size,
+      snapshot: snap,
+      spec: buildSpec(),
+      createdAt: nowMs(),
+    });
     setSubmit({ state: "sending" });
     try {
       const wrap = await captureWrap();
@@ -176,18 +204,46 @@ export default function Configurator() {
       {/* preview */}
       <div
         data-cursor="Drag"
-        className="bg-paper-2 relative h-[56vh] lg:sticky lg:top-0 lg:h-[calc(100svh-0px)]"
+        className="bg-paper-2 relative h-[56vh] bg-cover bg-center lg:sticky lg:top-0 lg:h-[calc(100svh-0px)]"
+        style={
+          scene === "studio"
+            ? undefined
+            : {
+                backgroundImage: `url(${SCENES.find((s) => s.id === scene)?.bg})`,
+              }
+        }
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-1/2 left-1/2 h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(circle at center, rgba(57,255,20,0.16), transparent 65%)",
-          }}
-        />
+        {scene === "studio" && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-1/2 h-[60vh] w-[60vh] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle at center, rgba(57,255,20,0.16), transparent 65%)",
+            }}
+          />
+        )}
         <ConfiguratorCanvas onReady={(gl) => (glRef.current = gl)} />
-        <p className="text-ink-soft pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] tracking-[0.22em] uppercase">
+
+        {/* scene picker — see the cup in context */}
+        <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-1.5">
+          {SCENES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setScene(s.id)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-bold backdrop-blur-md transition-colors ${
+                scene === s.id
+                  ? "border-ink bg-ink text-paper"
+                  : "border-ink/15 bg-paper/70 text-ink hover:border-ink/40"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+
+        <p className="text-ink pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/50 px-3 py-1 font-mono text-[11px] tracking-[0.2em] uppercase backdrop-blur-sm">
           Drag to rotate · scroll to zoom
         </p>
       </div>

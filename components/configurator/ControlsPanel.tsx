@@ -8,7 +8,6 @@ import {
   Plus,
   X,
   ImageIcon,
-  Repeat,
   Square,
   Circle,
   Minus,
@@ -19,6 +18,7 @@ import {
   type CupSize,
   type PatternKind,
   type ShapeKind,
+  type LogoFit,
 } from "@/store/configurator";
 import { PRODUCTS, QTY_TIERS, priceFor } from "@/lib/products";
 import { gbp } from "@/lib/format";
@@ -39,6 +39,14 @@ const SHAPE_TOOLS: { kind: ShapeKind; label: string; Icon: typeof Square }[] = [
   { kind: "circle", label: "Circle", Icon: Circle },
   { kind: "line", label: "Line", Icon: Minus },
   { kind: "triangle", label: "Triangle", Icon: Triangle },
+];
+
+const LOGO_FITS: { mode: LogoFit; label: string }[] = [
+  { mode: "fill", label: "Fill" },
+  { mode: "fit", label: "Fit" },
+  { mode: "stretch", label: "Stretch" },
+  { mode: "tile", label: "Tile" },
+  { mode: "custom", label: "Place" },
 ];
 
 const BASE_SWATCHES = [
@@ -279,60 +287,42 @@ export default function ControlsPanel() {
               </button>
             </div>
 
-            {/* tile toggle — spread the logo across the whole cup */}
-            <button
-              type="button"
-              onClick={() => c.setLogoTransform({ logoTile: !c.logoTile })}
-              className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
-                c.logoTile
-                  ? "border-green bg-green/10 text-ink"
-                  : "border-ink/15 text-ink-soft hover:border-ink/40"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <Repeat size={15} /> Repeat across the whole cup
-              </span>
-              <span>{c.logoTile ? "On" : "Off"}</span>
-            </button>
+            {/* fit mode — wallpaper-style placement */}
+            <div className="grid grid-cols-5 gap-1.5">
+              {LOGO_FITS.map((m) => (
+                <button
+                  key={m.mode}
+                  type="button"
+                  onClick={() => c.setLogoTransform({ logoFit: m.mode })}
+                  className={`rounded-lg border py-2 text-[11px] font-bold transition-colors duration-150 ease-out ${
+                    c.logoFit === m.mode
+                      ? "border-green bg-green/15 text-ink"
+                      : "border-ink/15 text-ink-soft hover:border-ink/40"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
 
-            <Slider
-              label="Size"
-              value={c.logoScale}
-              min={0.2}
-              max={1.6}
-              step={0.02}
-              onChange={(v) => c.setLogoTransform({ logoScale: v })}
-            />
-            <Slider
-              label="Rotate"
-              value={c.logoRotation}
-              min={-180}
-              max={180}
-              step={1}
-              onChange={(v) => c.setLogoTransform({ logoRotation: v })}
-            />
-
-            {c.logoTile ? (
+            {c.logoFit === "custom" && (
               <>
                 <Slider
-                  label="Across"
-                  value={c.logoTileCols}
-                  min={1}
-                  max={8}
-                  step={1}
-                  onChange={(v) => c.setLogoTransform({ logoTileCols: v })}
+                  label="Size"
+                  value={c.logoScale}
+                  min={0.2}
+                  max={1.6}
+                  step={0.02}
+                  onChange={(v) => c.setLogoTransform({ logoScale: v })}
                 />
                 <Slider
-                  label="Down"
-                  value={c.logoTileRows}
-                  min={1}
-                  max={6}
+                  label="Rotate"
+                  value={c.logoRotation}
+                  min={-180}
+                  max={180}
                   step={1}
-                  onChange={(v) => c.setLogoTransform({ logoTileRows: v })}
+                  onChange={(v) => c.setLogoTransform({ logoRotation: v })}
                 />
-              </>
-            ) : (
-              <>
                 <Slider
                   label="Across"
                   value={c.logoX}
@@ -350,6 +340,48 @@ export default function ControlsPanel() {
                   onChange={(v) => c.setLogoTransform({ logoY: v })}
                 />
               </>
+            )}
+
+            {c.logoFit === "tile" && (
+              <>
+                <Slider
+                  label="Size"
+                  value={c.logoScale}
+                  min={0.2}
+                  max={1.6}
+                  step={0.02}
+                  onChange={(v) => c.setLogoTransform({ logoScale: v })}
+                />
+                <Slider
+                  label="Across"
+                  value={c.logoTileCols}
+                  min={1}
+                  max={8}
+                  step={1}
+                  onChange={(v) => c.setLogoTransform({ logoTileCols: v })}
+                />
+                <Slider
+                  label="Down"
+                  value={c.logoTileRows}
+                  min={1}
+                  max={6}
+                  step={1}
+                  onChange={(v) => c.setLogoTransform({ logoTileRows: v })}
+                />
+              </>
+            )}
+
+            {(c.logoFit === "fill" ||
+              c.logoFit === "fit" ||
+              c.logoFit === "stretch") && (
+              <p className="text-ink-soft text-xs leading-relaxed">
+                {c.logoFit === "fill" &&
+                  "Your logo covers the whole cup, cropping to fit."}
+                {c.logoFit === "fit" &&
+                  "Your logo sits as large as it can without cropping."}
+                {c.logoFit === "stretch" &&
+                  "Your logo is stretched to wrap the cup edge to edge."}
+              </p>
             )}
           </div>
         ) : (
@@ -563,7 +595,7 @@ export default function ControlsPanel() {
               onClick={() =>
                 c.applyPreset({
                   baseColor: p.base,
-                  logoTile: false,
+                  logoFit: "custom",
                   textLines: p.text
                     ? [
                         {

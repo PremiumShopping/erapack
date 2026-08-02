@@ -1,46 +1,80 @@
 "use client";
 
-import { useState } from "react";
-import { X } from "lucide-react";
-import { usePersistentFlag } from "@/lib/useMediaQuery";
+function GoogleG() {
+  return (
+    <svg viewBox="0 0 48 48" className="h-3.5 w-3.5 shrink-0" aria-hidden>
+      <path
+        fill="#4285F4"
+        d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M11.69 28.18c-.44-1.32-.69-2.73-.69-4.18s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
+      />
+      <path
+        fill="#EA4335"
+        d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
+      />
+    </svg>
+  );
+}
 
-const KEY = "erapack:promo-dismissed";
+const ITEMS: { node: React.ReactNode }[] = [
+  { node: "Free UK shipping over £100" },
+  { node: "Orders arrive in 2–3 business days" },
+  {
+    node: (
+      <span className="flex items-center gap-1.5">
+        <GoogleG />
+        <span className="tracking-tight">★★★★★</span> Trusted by 700+ customers
+      </span>
+    ),
+  },
+  { node: "Free artwork & design help" },
+  { node: "No / low minimum order" },
+  { node: "Printed in Britain" },
+];
+
+function Row({ hidden = false }: { hidden?: boolean }) {
+  return (
+    <ul
+      aria-hidden={hidden || undefined}
+      className="flex shrink-0 items-center"
+    >
+      {ITEMS.map((it, i) => (
+        <li
+          key={i}
+          className="text-ink flex items-center text-sm font-bold whitespace-nowrap"
+        >
+          <span aria-hidden className="text-ink/45 mx-6">
+            ✳
+          </span>
+          {it.node}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /**
- * Thin espresso strip at the very top. Dismissible (remembered in
- * localStorage). Scrolls away with the page — only the nav sticks.
+ * The announcement reel — an infinite horizontal marquee of the shipping /
+ * delivery / reviews / design-help messages, mirroring the live erapack.uk.
+ * Two identical rows shifted by half so the loop is seamless. Scrolls away
+ * with the page; only the nav sticks.
  */
 export default function PromoBanner() {
-  const persisted = usePersistentFlag(KEY);
-  const [justDismissed, setJustDismissed] = useState(false);
-
-  if (persisted || justDismissed) return null;
-
   return (
-    <div className="bg-green text-ink relative z-40">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-center px-10 py-2">
-        <p className="eyebrow !text-ink flex flex-wrap items-center justify-center gap-x-3 gap-y-1 !font-bold">
-          <span>Free UK shipping over £100</span>
-          <span className="text-ink/40 hidden sm:inline">✳</span>
-          <span className="hidden sm:inline">Low / no minimum order</span>
-          <span className="text-ink/40 hidden md:inline">✳</span>
-          <span className="hidden md:inline">2–3 day turnaround</span>
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            try {
-              localStorage.setItem(KEY, "1");
-            } catch {
-              /* localStorage unavailable */
-            }
-            setJustDismissed(true);
-          }}
-          aria-label="Dismiss announcement"
-          className="text-ink/60 hover:bg-ink/10 hover:text-ink absolute right-3 grid h-7 w-7 place-items-center rounded-full transition-colors duration-200 ease-out"
-        >
-          <X size={14} strokeWidth={2} />
-        </button>
+    <div
+      className="bg-green relative z-40 overflow-hidden py-2.5"
+      aria-label="Shop announcements"
+    >
+      <div className="marquee-track flex w-max">
+        <Row />
+        <Row hidden />
       </div>
     </div>
   );
