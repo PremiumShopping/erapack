@@ -110,7 +110,7 @@ export default function ProcessBackground({
             playsInline
             loop={loop}
             autoPlay={loop}
-            preload="auto"
+            preload={idx === 0 ? "auto" : "metadata"}
             className="absolute inset-0 h-full w-full object-cover"
             style={{ opacity: idx === 0 ? 1 : 0 }}
           />
