@@ -34,30 +34,50 @@ export function drawCupArtwork(
   }
   ctx.restore();
 
-  // logo
+  // logo — a single placement, or tiled across the whole wrap
   if (logo && logo.width > 0) {
-    const boxW = w * 0.3 * config.logoScale;
     const aspect = logo.height / logo.width;
-    const boxH = boxW * aspect;
-    const cx = config.logoX * w;
-    const cy = (1 - config.logoY) * h;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate((config.logoRotation * Math.PI) / 180);
-    ctx.drawImage(logo, -boxW / 2, -boxH / 2, boxW, boxH);
-    ctx.restore();
+    const rot = (config.logoRotation * Math.PI) / 180;
+    const drawAt = (cx: number, cy: number, boxW: number) => {
+      const boxH = boxW * aspect;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.drawImage(logo, -boxW / 2, -boxH / 2, boxW, boxH);
+      ctx.restore();
+    };
+    if (config.logoTile) {
+      const cols = Math.max(1, Math.round(config.logoTileCols));
+      const rows = Math.max(1, Math.round(config.logoTileRows));
+      const cellW = w / cols;
+      const cellH = h / rows;
+      const boxW = cellW * 0.72 * config.logoScale;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          drawAt((c + 0.5) * cellW, (r + 0.5) * cellH, boxW);
+        }
+      }
+    } else {
+      drawAt(
+        config.logoX * w,
+        (1 - config.logoY) * h,
+        w * 0.3 * config.logoScale,
+      );
+    }
   }
 
-  // text lines
+  // text lines — full x / y / rotation / size control
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const line of config.textLines) {
     if (!line.text) continue;
     const fs = h * 0.11 * line.size;
     ctx.save();
+    ctx.translate(line.x * w, (1 - line.y) * h);
+    ctx.rotate((line.rotation * Math.PI) / 180);
     ctx.font = `800 ${fs}px Assistant, ui-sans-serif, sans-serif`;
     ctx.fillStyle = line.color;
-    ctx.fillText(line.text, w / 2, (1 - line.y) * h);
+    ctx.fillText(line.text, 0, 0);
     ctx.restore();
   }
 }

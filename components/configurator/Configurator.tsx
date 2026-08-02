@@ -8,7 +8,8 @@ import { Lock, Unlock, ShoppingBag, Check, RotateCcw } from "lucide-react";
 import ControlsPanel from "@/components/configurator/ControlsPanel";
 import { useConfigurator } from "@/store/configurator";
 import { useCart } from "@/store/cart";
-import { PRODUCTS } from "@/lib/products";
+import { PRODUCTS, priceFor } from "@/lib/products";
+import { gbp } from "@/lib/format";
 import { useHydrated } from "@/lib/useMediaQuery";
 
 const ConfiguratorCanvas = dynamic(
@@ -25,18 +26,16 @@ const ConfiguratorCanvas = dynamic(
   },
 );
 
-const priceToNumber = (s: string) => parseFloat(s.replace(/[^0-9.]/g, "")) || 0;
-
 export default function Configurator() {
   const glRef = useRef<THREE.WebGLRenderer | null>(null);
   const config = useConfigurator();
   const addToCart = useCart((s) => s.add);
   const [snapshot, setSnapshot] = useState<string | null>(null);
-  const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const hydrated = useHydrated();
 
   const product = PRODUCTS.find((p) => p.size === config.size);
+  const priced = product ? priceFor(product.price1000, config.quantity) : null;
 
   const capture = () => {
     const gl = glRef.current;
@@ -57,9 +56,9 @@ export default function Configurator() {
     addToCart({
       size: config.size,
       name: product?.name ?? `${config.size} cup`,
-      qty,
-      unitPrice: priceToNumber(product?.price ?? "0"),
-      priceLabel: product?.price ?? "",
+      qty: config.quantity,
+      unitPrice: priced?.perUnit ?? 0,
+      priceLabel: priced ? `${gbp(priced.perUnit)}/unit` : "",
       snapshot,
       spec: {
         size: config.size,
@@ -69,7 +68,11 @@ export default function Configurator() {
         logoX: config.logoX,
         logoY: config.logoY,
         logoRotation: config.logoRotation,
+        logoTile: config.logoTile,
+        logoTileCols: config.logoTileCols,
+        logoTileRows: config.logoTileRows,
         textLines: config.textLines,
+        quantity: config.quantity,
         locked: true,
       },
     });
@@ -184,32 +187,30 @@ export default function Configurator() {
                 </dd>
               </dl>
 
-              <div className="flex items-center justify-between">
-                <span className="text-ink-soft text-sm font-semibold">
-                  Quantity
-                </span>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    aria-label="Decrease"
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    className="border-ink/20 text-ink hover:border-ink/40 grid h-8 w-8 place-items-center rounded-full border"
-                  >
-                    −
-                  </button>
-                  <span className="text-ink w-8 text-center font-bold">
-                    {qty}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="Increase"
-                    onClick={() => setQty((q) => q + 1)}
-                    className="border-ink/20 text-ink hover:border-ink/40 grid h-8 w-8 place-items-center rounded-full border"
-                  >
-                    +
-                  </button>
+              {priced && (
+                <div className="border-ink/10 bg-paper space-y-1 rounded-2xl border p-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-ink-soft">Quantity</span>
+                    <span className="text-ink font-semibold">
+                      {config.quantity.toLocaleString("en-GB")} cups
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-ink-soft">Per unit</span>
+                    <span className="text-ink font-semibold">
+                      {gbp(priced.perUnit)}
+                    </span>
+                  </div>
+                  <div className="border-ink/10 flex justify-between border-t pt-1">
+                    <span className="text-ink font-bold">
+                      Total (excl. VAT)
+                    </span>
+                    <span className="display text-ink text-lg font-extrabold">
+                      {gbp(priced.total)}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex flex-wrap gap-3">
                 <button
@@ -237,7 +238,6 @@ export default function Configurator() {
               config.reset();
               setSnapshot(null);
               setAdded(false);
-              setQty(1);
             }}
             className="text-ink-soft hover:text-ink mt-4 inline-flex items-center gap-1.5 text-xs font-semibold"
           >

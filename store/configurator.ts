@@ -10,7 +10,9 @@ export type TextLine = {
   text: string;
   color: string;
   size: number; // relative font size
+  x: number; // 0..1 horizontal position on the wrap
   y: number; // 0..1 vertical position on the wrap
+  rotation: number; // degrees
 };
 
 export type CupConfig = {
@@ -21,7 +23,11 @@ export type CupConfig = {
   logoX: number; // 0..1 around the wrap
   logoY: number; // 0..1 vertical
   logoRotation: number; // degrees
+  logoTile: boolean; // repeat the logo across the whole wrap
+  logoTileCols: number; // horizontal repeats when tiling
+  logoTileRows: number; // vertical repeats when tiling
   textLines: TextLine[];
+  quantity: number; // order quantity (tier)
   locked: boolean;
 };
 
@@ -31,9 +37,19 @@ type ConfigStore = CupConfig & {
   setLogo: (dataUrl: string | null) => void;
   setLogoTransform: (
     t: Partial<
-      Pick<CupConfig, "logoScale" | "logoX" | "logoY" | "logoRotation">
+      Pick<
+        CupConfig,
+        | "logoScale"
+        | "logoX"
+        | "logoY"
+        | "logoRotation"
+        | "logoTile"
+        | "logoTileCols"
+        | "logoTileRows"
+      >
     >,
   ) => void;
+  setQuantity: (q: number) => void;
   addTextLine: () => void;
   updateTextLine: (id: string, patch: Partial<TextLine>) => void;
   removeTextLine: (id: string) => void;
@@ -56,7 +72,11 @@ const DEFAULT: CupConfig = {
   logoX: 0.5,
   logoY: 0.5,
   logoRotation: 0,
+  logoTile: false,
+  logoTileCols: 3,
+  logoTileRows: 3,
   textLines: [],
+  quantity: 1000,
   locked: false,
 };
 
@@ -68,23 +88,22 @@ export const useConfigurator = create<ConfigStore>()(
       setBaseColor: (baseColor) => set({ baseColor }),
       setLogo: (logoDataUrl) => set({ logoDataUrl }),
       setLogoTransform: (t) => set((s) => ({ ...s, ...t })),
+      setQuantity: (quantity) => set({ quantity }),
       addTextLine: () =>
-        set((s) =>
-          s.textLines.length >= 3
-            ? s
-            : {
-                textLines: [
-                  ...s.textLines,
-                  {
-                    id: uid(),
-                    text: "YOUR TEXT",
-                    color: "#2B2320",
-                    size: 1,
-                    y: 0.5,
-                  },
-                ],
-              },
-        ),
+        set((s) => ({
+          textLines: [
+            ...s.textLines,
+            {
+              id: uid(),
+              text: "YOUR TEXT",
+              color: "#0F1211",
+              size: 1,
+              x: 0.5,
+              y: Math.max(0.06, 0.5 - s.textLines.length * 0.12),
+              rotation: 0,
+            },
+          ],
+        })),
       updateTextLine: (id, patch) =>
         set((s) => ({
           textLines: s.textLines.map((l) =>
@@ -98,6 +117,6 @@ export const useConfigurator = create<ConfigStore>()(
       unlock: () => set({ locked: false }),
       reset: () => set({ ...DEFAULT }),
     }),
-    { name: "erapack:design-v2" },
+    { name: "erapack:design-v3" },
   ),
 );

@@ -2,9 +2,10 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
-import { Upload, Trash2, Plus, X, ImageIcon } from "lucide-react";
+import { Upload, Trash2, Plus, X, ImageIcon, Repeat } from "lucide-react";
 import { useConfigurator, type CupSize } from "@/store/configurator";
-import { PRODUCTS } from "@/lib/products";
+import { PRODUCTS, QTY_TIERS, priceFor } from "@/lib/products";
+import { gbp } from "@/lib/format";
 
 const SIZES: CupSize[] = ["4oz", "6oz", "8oz", "12oz"];
 
@@ -73,17 +74,14 @@ export default function ControlsPanel() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/png": [],
-      "image/jpeg": [],
-      "image/svg+xml": [],
-    },
+    accept: { "image/png": [], "image/jpeg": [], "image/svg+xml": [] },
     maxSize: 5 * 1024 * 1024,
     multiple: false,
     disabled: c.locked,
   });
 
-  const price = PRODUCTS.find((p) => p.size === c.size)?.price ?? "";
+  const product = PRODUCTS.find((p) => p.size === c.size);
+  const priced = product ? priceFor(product.price1000, c.quantity) : null;
   const disabled = c.locked;
 
   return (
@@ -108,9 +106,40 @@ export default function ControlsPanel() {
             </button>
           ))}
         </div>
-        <p className="text-ink-soft mt-2 text-sm">
-          From <span className="text-ink font-bold">{price}</span>
-        </p>
+      </Field>
+
+      {/* quantity — real volume tiers from erapack.uk */}
+      <Field label="Quantity">
+        <div className="grid grid-cols-3 gap-2">
+          {QTY_TIERS.map((t) => (
+            <button
+              key={t.qty}
+              type="button"
+              onClick={() => c.setQuantity(t.qty)}
+              className={`rounded-xl border py-2.5 text-sm font-bold transition-colors duration-150 ease-out ${
+                c.quantity === t.qty
+                  ? "border-green bg-green/15 text-ink"
+                  : "border-ink/15 text-ink-soft hover:border-ink/40"
+              }`}
+            >
+              {t.qty.toLocaleString("en-GB")}
+              {t.discount > 0 && (
+                <span className="text-green-deep block text-[10px] font-semibold">
+                  −{Math.round(t.discount * 100)}%
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        {priced && (
+          <p className="text-ink-soft mt-3 text-sm">
+            <span className="text-ink font-bold">{gbp(priced.perUnit)}</span>
+            /unit ·{" "}
+            <span className="text-ink font-bold">{gbp(priced.total)}</span>{" "}
+            total
+            <span className="text-ink-soft/70"> (excl. VAT)</span>
+          </p>
+        )}
       </Field>
 
       {/* base colour */}
@@ -142,7 +171,7 @@ export default function ControlsPanel() {
         </div>
       </Field>
 
-      {/* logo upload */}
+      {/* logo */}
       <Field label="Your logo">
         {c.logoDataUrl ? (
           <div className="space-y-4">
@@ -163,38 +192,79 @@ export default function ControlsPanel() {
                 <Trash2 size={16} />
               </button>
             </div>
+
+            {/* tile toggle — spread the logo across the whole cup */}
+            <button
+              type="button"
+              onClick={() => c.setLogoTransform({ logoTile: !c.logoTile })}
+              className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                c.logoTile
+                  ? "border-green bg-green/10 text-ink"
+                  : "border-ink/15 text-ink-soft hover:border-ink/40"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Repeat size={15} /> Repeat across the whole cup
+              </span>
+              <span>{c.logoTile ? "On" : "Off"}</span>
+            </button>
+
             <Slider
               label="Size"
               value={c.logoScale}
               min={0.2}
-              max={1.4}
+              max={1.6}
               step={0.02}
               onChange={(v) => c.setLogoTransform({ logoScale: v })}
             />
             <Slider
-              label="Across"
-              value={c.logoX}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(v) => c.setLogoTransform({ logoX: v })}
-            />
-            <Slider
-              label="Height"
-              value={c.logoY}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(v) => c.setLogoTransform({ logoY: v })}
-            />
-            <Slider
               label="Rotate"
               value={c.logoRotation}
-              min={-45}
-              max={45}
+              min={-180}
+              max={180}
               step={1}
               onChange={(v) => c.setLogoTransform({ logoRotation: v })}
             />
+
+            {c.logoTile ? (
+              <>
+                <Slider
+                  label="Across"
+                  value={c.logoTileCols}
+                  min={1}
+                  max={8}
+                  step={1}
+                  onChange={(v) => c.setLogoTransform({ logoTileCols: v })}
+                />
+                <Slider
+                  label="Down"
+                  value={c.logoTileRows}
+                  min={1}
+                  max={6}
+                  step={1}
+                  onChange={(v) => c.setLogoTransform({ logoTileRows: v })}
+                />
+              </>
+            ) : (
+              <>
+                <Slider
+                  label="Across"
+                  value={c.logoX}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  onChange={(v) => c.setLogoTransform({ logoX: v })}
+                />
+                <Slider
+                  label="Height"
+                  value={c.logoY}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  onChange={(v) => c.setLogoTransform({ logoY: v })}
+                />
+              </>
+            )}
           </div>
         ) : (
           <div
@@ -220,7 +290,7 @@ export default function ControlsPanel() {
         )}
       </Field>
 
-      {/* text */}
+      {/* text — unlimited lines, full control */}
       <Field label="Text">
         <div className="space-y-4">
           {c.textLines.map((line) => (
@@ -233,11 +303,12 @@ export default function ControlsPanel() {
                   value={line.text}
                   onChange={(e) =>
                     c.updateTextLine(line.id, {
-                      text: e.target.value.slice(0, 22),
+                      text: e.target.value.slice(0, 24),
                     })
                   }
                   className="border-ink/15 bg-paper text-ink focus:border-green w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
                   placeholder="Cup text"
+                  aria-label="Cup text"
                 />
                 <input
                   type="color"
@@ -260,10 +331,18 @@ export default function ControlsPanel() {
               <Slider
                 label="Size"
                 value={line.size}
-                min={0.5}
-                max={2}
+                min={0.4}
+                max={2.4}
                 step={0.05}
                 onChange={(v) => c.updateTextLine(line.id, { size: v })}
+              />
+              <Slider
+                label="Across"
+                value={line.x}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(v) => c.updateTextLine(line.id, { x: v })}
               />
               <Slider
                 label="Height"
@@ -273,17 +352,23 @@ export default function ControlsPanel() {
                 step={0.01}
                 onChange={(v) => c.updateTextLine(line.id, { y: v })}
               />
+              <Slider
+                label="Rotate"
+                value={line.rotation}
+                min={-90}
+                max={90}
+                step={1}
+                onChange={(v) => c.updateTextLine(line.id, { rotation: v })}
+              />
             </div>
           ))}
-          {c.textLines.length < 3 && (
-            <button
-              type="button"
-              onClick={c.addTextLine}
-              className="border-ink/20 text-ink hover:border-green-deep hover:text-green-deep inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-            >
-              <Plus size={16} /> Add a line
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={c.addTextLine}
+            className="border-ink/20 text-ink hover:border-green-deep hover:text-green-deep inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
+          >
+            <Plus size={16} /> Add text
+          </button>
         </div>
       </Field>
 
@@ -297,6 +382,7 @@ export default function ControlsPanel() {
               onClick={() =>
                 c.applyPreset({
                   baseColor: p.base,
+                  logoTile: false,
                   textLines: p.text
                     ? [
                         {
@@ -304,7 +390,9 @@ export default function ControlsPanel() {
                           text: p.text,
                           color: p.textColor,
                           size: 1,
+                          x: 0.5,
                           y: 0.5,
+                          rotation: 0,
                         },
                       ]
                     : [],

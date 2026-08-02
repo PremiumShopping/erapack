@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import ShopGrid from "@/components/sections/ShopGrid";
 import ClosingCTA from "@/components/sections/ClosingCTA";
 import { PRODUCTS } from "@/lib/products";
+import { gbp } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Shop — custom paper cups",
@@ -96,7 +97,9 @@ export default function ShopPage() {
                     <td className="text-ink-soft px-6 py-5">1 (no minimum)</td>
                     <td className="text-ink-soft px-6 py-5">2–3 days</td>
                     <td className="px-6 py-5">
-                      <span className="text-ink font-bold">{p.price}</span>
+                      <span className="text-ink font-bold">
+                        {gbp(p.price1000)}
+                      </span>
                     </td>
                   </tr>
                 ))}

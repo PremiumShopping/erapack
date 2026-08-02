@@ -6,6 +6,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { PRODUCTS, PRODUCT_FEATURES, CUP_TINTS } from "@/lib/products";
 import { ease } from "@/lib/design-tokens";
 import CupGlyph from "@/components/ui/CupGlyph";
+import { gbp } from "@/lib/format";
 
 export default function ShopGrid() {
   return (
@@ -63,8 +64,11 @@ export default function ShopGrid() {
                 From
               </span>
               <div className="display text-ink text-2xl font-extrabold">
-                {p.price}
+                {gbp(p.price1000)}
               </div>
+              <span className="text-ink-soft text-[11px] font-semibold">
+                per 1,000
+              </span>
             </div>
           </div>
 

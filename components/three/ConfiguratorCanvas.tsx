@@ -55,6 +55,9 @@ function Cup({ spin }: { spin: boolean }) {
     config.logoX,
     config.logoY,
     config.logoRotation,
+    config.logoTile,
+    config.logoTileCols,
+    config.logoTileRows,
     config.textLines,
   ]);
 
